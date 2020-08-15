@@ -16,3 +16,14 @@
 // For Bukkit projects.
 implementation("io.github.portlek:scoreboard-bukkit:${version}")
 ```
+## Example usage
+```java
+final class TestScoreboard {
+
+    void sendScoreboard(@NotNull Plugin plugin, @NotNull final Player player) {
+        Board.create(plugin)
+            .start();
+    }
+
+}
+```

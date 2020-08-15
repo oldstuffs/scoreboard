@@ -3,10 +3,6 @@
          xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <modules>
-        <module>common</module>
-        <module>bukkit</module>
-    </modules>
     <parent>
         <artifactId>ppom</artifactId>
         <groupId>io.github.portlek</groupId>
@@ -15,7 +11,6 @@
     <artifactId>scoreboard-parent</artifactId>
     <version>1.0-SNAPSHOT</version>
     <name>scoreboard-parent</name>
-    <packaging>pom</packaging>
     <description>A simple scoreboard library for Minecraft plugins.</description>
     <url>https://github.com/portlek/scoreboard</url>
 
@@ -25,5 +20,13 @@
         <url>https://github.com/portlek/scoreboard</url>
     </scm>
 
+    <dependencies>
+        <dependency>
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot-api</artifactId>
+            <version>1.16.2-R0.1-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
 
 </project>
