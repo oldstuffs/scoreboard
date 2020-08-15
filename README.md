@@ -1,8 +1,8 @@
 [![idea](https://www.elegantobjects.org/intellij-idea.svg)](https://www.jetbrains.com/idea/)
-[![rultor](https://www.rultor.com/b/yegor256/rultor)](https://www.rultor.com/p/portlek/configs)
+[![rultor](https://www.rultor.com/b/yegor256/rultor)](https://www.rultor.com/p/portlek/scoreboard)
 
-[![Build Status](https://travis-ci.com/portlek/configs.svg?branch=master)](https://travis-ci.com/portlek/configs)
-![Maven Central](https://img.shields.io/maven-central/v/io.github.portlek/configs-core?label=version)
+[![Build Status](https://travis-ci.com/portlek/scoreboard.svg?branch=master)](https://travis-ci.com/portlek/scoreboard)
+![Maven Central](https://img.shields.io/maven-central/v/io.github.portlek/scoreboard-common?label=version)
 ## How to use
 ```xml
 <!-- For Bukkit projects. -->
