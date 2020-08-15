@@ -14,5 +14,5 @@
 ```
 ```groovy
 // For Bukkit projects.
-implementation("io.github.portlek:configs-core:${version}")
+implementation("io.github.portlek:scoreboard-bukkit:${version}")
 ```
