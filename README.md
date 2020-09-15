@@ -27,39 +27,23 @@ implementation("io.github.portlek:scoreboard-bukkit:${version}")
 final class TestScoreboard {
 
     void sendScoreboard(@NotNull Plugin plugin, @NotNull final List<Player> players) {
-        BukkitBoard.create(plugin)
-            // Adds the players that scoreboard shows up.
-            .addObserver(players)
-            // Runs before the scoreboard sent for each player. The players list depend on the `sendType`
-            // If returns false, player can get the scoreboard for the currency tick.
-            .filter(player -> {
-                return player.getName().equals("Test");
-            })
-            // Runs before the scoreboard sent for each player. The players list depend on the `sendType`
-            // Removes the player from the list that contains all listed players.
-            .removeIf(player -> {
-                return player.getName().equals("ShouldRemove");
-            })
-            .runBefore(player -> {
-                player.sendMessage("This message sent before the scoreboard sent!");
-            })
-            .runAfter(player -> {
-                player.sendMessage("This message sent after the scoreboard sent!");
-            })
-            // Sends the first scoreboard after this value. (20 = 1 second)
+        final BukkitBoard board = BukkitBoard.create(this.plugin)
+            .addObserver(this.players)
+            .filter(observer -> "Test".equals(observer.get().getName()))
+            .removeIf(observer -> "ShouldRemove".equals(observer.get().getName()))
+            .runBefore(observer ->
+                observer.get().sendMessage("This message sent before the scoreboard sent!"))
+            .runAfter(observer ->
+                observer.get().sendMessage("This message sent after the scoreboard sent!"))
             .startDelay(0L)
-            // Sends the scoreboards with this period. (20 = 1 second)
-            .tick(10L)
-            .newLineBuilder()
-            // Title's line is 0.
+            .tick(10L);
+        board.newLineBuilder()
             .staticLine(0, "Static Title")
-            // Lines start from 1.
             .staticLine(1, "Static Line!")
             .dynamicLine(2, () -> "Dynamic Line!")
-            .observerLine(3, observer -> observer.get().getName() + " Line!")
-            .back()
-            //.sendOnce() Disable the task and send the scoreboard for each player just for once.
-            .start();
+            .observerLine(3, observer -> observer.get().getName() + " Line!");
+        board.start();
+        //board.sendOnce();
     }
 
 }

@@ -25,30 +25,37 @@
 
 package io.github.portlek.scoreboard;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
-import org.jetbrains.annotations.NotNull;
+import org.junit.jupiter.api.Test;
 
-public final class BukkitBoard extends Board<Player, BukkitPlugin, BukkitBoard> {
+final class BukkitTest {
 
-    public BukkitBoard(@NotNull final Plugin plugin) {
-        super(new BukkitPlugin(plugin));
-    }
+    private final org.bukkit.plugin.Plugin plugin = null;
 
-    @NotNull
-    public static BukkitBoard create(@NotNull final Plugin plugin) {
-        return new BukkitBoard(plugin);
-    }
+    private final List<Player> players = new ArrayList<>();
 
-    @NotNull
-    @Override
-    public BukkitBoard self() {
-        return this;
-    }
-
-    @Override
-    public Observer<Player> createObserver(@NotNull final Player observer) {
-        return new BukkitObserver(observer);
+    @Test
+    void run() {
+        assert this.plugin != null;
+        final BukkitBoard board = BukkitBoard.create(this.plugin)
+            .addObserver(this.players)
+            .filter(observer -> "Test".equals(observer.get().getName()))
+            .removeIf(observer -> "ShouldRemove".equals(observer.get().getName()))
+            .runBefore(observer ->
+                observer.get().sendMessage("This message sent before the scoreboard sent!"))
+            .runAfter(observer ->
+                observer.get().sendMessage("This message sent after the scoreboard sent!"))
+            .startDelay(0L)
+            .tick(10L);
+        board.newLineBuilder()
+            .staticLine(0, "Static Title")
+            .staticLine(1, "Static Line!")
+            .dynamicLine(2, () -> "Dynamic Line!")
+            .observerLine(3, observer -> observer.get().getName() + " Line!");
+        board.start();
+        //board.sendOnce();
     }
 
 }
