@@ -41,15 +41,22 @@ final class TestScoreboard {
             .afterSend(player -> {
                 player.sendMessage("This message sent after the scoreboard sent!");
             })
+            // Send the player which added with `addPlayers` methods.
             .sendType(SendType.forEachPlayer(player -> {
                 // You can use PlaceholderAPI plugin here.
                 return Arrays.asList("line 1", "line 2", player.getName());
             }))
+            // Sends all players on the server, not depend on the `addPlayers` method.
             .sendType(SendType.forEachOnlinePlayer(online -> {
                 // You can use PlaceholderAPI plugin here.
                 return Arrays.asList("line 1", "line 2", player.getName());
             }))
-            .sendType(SendType.lines(() -> {
+            // Send the player which added with `addPlayers` methods.
+            .sendType(SendType.forEachPlayerLine(() -> {
+                return Arrays.asList("line 1", "line 2", "line 3");
+            }))
+            // Sends all players on the server, not depend on the `addPlayers` method.
+            .sendType(SendType.forEachOnlinePlayerLine(() -> {
                 return Arrays.asList("line 1", "line 2", "line 3");
             }))
             .startDelay(0L)
