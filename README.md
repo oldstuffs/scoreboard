@@ -51,7 +51,12 @@ final class TestScoreboard {
             // Sends the scoreboards with this period. (20 = 1 second)
             .tick(10L)
             .newLineBuilder()
-            .staticLine()
+            // Title's line is 0.
+            .staticLine(0, "Static Title")
+            // Lines start from 1.
+            .staticLine(1, "Static Line!")
+            .dynamicLine(2, () -> "Dynamic Line!")
+            .observerLine(3, observer -> observer.get().getName() + " Line!")
             .back()
             //.sendOnce() Disable the task and send the scoreboard for each player just for once.
             .start();

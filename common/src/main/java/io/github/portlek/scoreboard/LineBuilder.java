@@ -28,6 +28,7 @@ package io.github.portlek.scoreboard;
 import io.github.portlek.scoreboard.line.DynamicLine;
 import io.github.portlek.scoreboard.line.ObserverLine;
 import io.github.portlek.scoreboard.line.StaticLine;
+import io.github.portlek.scoreboard.util.Utilities;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
@@ -62,6 +63,24 @@ public final class LineBuilder<O, P extends Plugin, B extends Board<O, P, B>> {
     @NotNull
     public LineBuilder<O, P, B> observerLine(final int line, @NotNull final Function<Observer<O>, String> observerLine) {
         this.observerLines.put(line, Line.observerLine(observerLine));
+        return this;
+    }
+
+    @NotNull
+    public LineBuilder<O, P, B> addStaticLine(@NotNull final String staticLine) {
+        this.staticLines.put(Utilities.maximum(this.staticLines.keySet()) + 1, Line.staticLine(staticLine));
+        return this;
+    }
+
+    @NotNull
+    public LineBuilder<O, P, B> addDynamicLine(@NotNull final Supplier<String> dynamicLine) {
+        this.dynamicLines.put(Utilities.maximum(this.dynamicLines.keySet()) + 1, Line.dynamicLine(dynamicLine));
+        return this;
+    }
+
+    @NotNull
+    public LineBuilder<O, P, B> addObserverLine(@NotNull final Function<Observer<O>, String> observerLine) {
+        this.observerLines.put(Utilities.maximum(this.observerLines.keySet()) + 1, Line.observerLine(observerLine));
         return this;
     }
 
