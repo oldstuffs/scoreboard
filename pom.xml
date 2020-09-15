@@ -11,6 +11,7 @@
     <artifactId>scoreboard-parent</artifactId>
     <version>1.0-SNAPSHOT</version>
     <name>scoreboard-parent</name>
+    <packaging>pom</packaging>
     <description>A simple scoreboard library for Minecraft plugins.</description>
     <url>https://github.com/portlek/scoreboard</url>
 
