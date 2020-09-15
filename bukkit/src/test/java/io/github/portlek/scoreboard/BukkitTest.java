@@ -25,20 +25,34 @@
 
 package io.github.portlek.scoreboard;
 
+import be.seeseemelk.mockbukkit.MockBukkit;
 import java.util.ArrayList;
 import java.util.List;
 import org.bukkit.entity.Player;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 final class BukkitTest {
 
-    private final org.bukkit.plugin.Plugin plugin = null;
+    private static org.bukkit.plugin.Plugin plugin;
 
     private final List<Player> players = new ArrayList<>();
 
+    @BeforeAll
+    static void setUp() {
+        MockBukkit.mock();
+        BukkitTest.plugin = MockBukkit.load(TestPlugin.class);
+    }
+
+    @AfterAll
+    static void tearDown() {
+        MockBukkit.unmock();
+    }
+
     @Test
     void run() {
-        final BukkitBoard board = BukkitBoard.create(this.plugin)
+        final BukkitBoard board = BukkitBoard.create(plugin)
             .addObserver(this.players)
             .filter(observer -> "Test".equals(observer.get().getName()))
             .removeIf(observer -> "ShouldRemove".equals(observer.get().getName()))
