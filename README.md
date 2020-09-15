@@ -59,7 +59,9 @@ final class TestScoreboard {
             .sendType(SendType.forEachOnlinePlayerLine(() -> {
                 return Arrays.asList("line 1", "line 2", "line 3");
             }))
+            // Sends the first scoreboard after this value. (20 = 1 second)
             .startDelay(0L)
+            // Sends the scoreboards with this period. (20 = 1 second)
             .tick(10L)
             //.sendOnce() Disable the task and send the scoreboard for each player just for once.
             .start();
