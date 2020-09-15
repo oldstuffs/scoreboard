@@ -21,17 +21,15 @@
 ```groovy
 // For Bukkit projects.
 implementation("io.github.portlek:scoreboard-bukkit:${version}")
-// For Nukkit projects.
-implementation("io.github.portlek:scoreboard-nukkit:${version}")
 ```
 ## Example usage
 ```java
 final class TestScoreboard {
 
     void sendScoreboard(@NotNull Plugin plugin, @NotNull final List<Player> players) {
-        Board.create(plugin)
+        BukkitBoard.create(plugin)
             // Adds the players that scoreboard shows up.
-            .addPlayers(players)
+            .addObserver(players)
             // Runs before the scoreboard sent for each player. The players list depend on the `sendType`
             // If returns false, player can get the scoreboard for the currency tick.
             .filter(player -> {
@@ -42,34 +40,19 @@ final class TestScoreboard {
             .removeIf(player -> {
                 return player.getName().equals("ShouldRemove");
             })
-            .beforeSend(player -> {
+            .runBefore(player -> {
                 player.sendMessage("This message sent before the scoreboard sent!");
             })
-            .afterSend(player -> {
+            .runAfter(player -> {
                 player.sendMessage("This message sent after the scoreboard sent!");
             })
-            // Send the player which added with `addPlayers` methods.
-            .sendType(SendType.forEachPlayer(player -> {
-                // You can use PlaceholderAPI plugin here.
-                return Arrays.asList("line 1", "line 2", player.getName());
-            }))
-            // Sends all players on the server, not depend on the `addPlayers` method.
-            .sendType(SendType.forEachOnlinePlayer(online -> {
-                // You can use PlaceholderAPI plugin here.
-                return Arrays.asList("line 1", "line 2", player.getName());
-            }))
-            // Send the player which added with `addPlayers` methods.
-            .sendType(SendType.forEachPlayerLine(() -> {
-                return Arrays.asList("line 1", "line 2", "line 3");
-            }))
-            // Sends all players on the server, not depend on the `addPlayers` method.
-            .sendType(SendType.forEachOnlinePlayerLine(() -> {
-                return Arrays.asList("line 1", "line 2", "line 3");
-            }))
             // Sends the first scoreboard after this value. (20 = 1 second)
             .startDelay(0L)
             // Sends the scoreboards with this period. (20 = 1 second)
             .tick(10L)
+            .newLineBuilder()
+            .staticLine()
+            .back()
             //.sendOnce() Disable the task and send the scoreboard for each player just for once.
             .start();
     }
