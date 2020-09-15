@@ -38,7 +38,6 @@ final class BukkitTest {
 
     @Test
     void run() {
-        assert this.plugin != null;
         final BukkitBoard board = BukkitBoard.create(this.plugin)
             .addObserver(this.players)
             .filter(observer -> "Test".equals(observer.get().getName()))
