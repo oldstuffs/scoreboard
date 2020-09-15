@@ -27,8 +27,8 @@ implementation("io.github.portlek:scoreboard-bukkit:${version}")
 final class TestScoreboard {
 
     void sendScoreboard(@NotNull Plugin plugin, @NotNull final List<Player> players) {
-        final BukkitBoard board = BukkitBoard.create(this.plugin)
-            .addObserver(this.players)
+        final BukkitBoard board = BukkitBoard.create(plugin)
+            .addObserver(players)
             .filter(observer -> "Test".equals(observer.get().getName()))
             .removeIf(observer -> "ShouldRemove".equals(observer.get().getName()))
             .runBefore(observer ->
