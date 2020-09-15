@@ -30,10 +30,17 @@ final class TestScoreboard {
 
     void sendScoreboard(@NotNull Plugin plugin, @NotNull final List<Player> players) {
         Board.create(plugin)
+            // Adds the players that scoreboard shows up.
             .addPlayers(players)
+            // Runs before the scoreboard sent for each player. The players depend on the `sendType`
+            // If returns false, player can get the scoreboard for the currency tick.
             .filter(player -> {
-                // Checks before the sent.
                 return player.getName().equals("Test");
+            })
+            // Runs before the scoreboard sent for each player. The players depend on the `sendType`
+            // Removes the player from the list that contains all listed players.
+            .removeIf(player -> {
+                return player.getName().equals("ShouldRemove");
             })
             .beforeSend(player -> {
                 player.sendMessage("This message sent before the scoreboard sent!");
