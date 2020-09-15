@@ -52,7 +52,7 @@ final class BukkitTest {
 
     @Test
     void run() {
-        final BukkitBoard board = BukkitBoard.create(plugin)
+        final BukkitBoard board = BukkitBoard.create(BukkitTest.plugin)
             .addObserver(this.players)
             .filter(observer -> "Test".equals(observer.get().getName()))
             .removeIf(observer -> "ShouldRemove".equals(observer.get().getName()))
