@@ -32,12 +32,12 @@ final class TestScoreboard {
         Board.create(plugin)
             // Adds the players that scoreboard shows up.
             .addPlayers(players)
-            // Runs before the scoreboard sent for each player. The players depend on the `sendType`
+            // Runs before the scoreboard sent for each player. The players list depend on the `sendType`
             // If returns false, player can get the scoreboard for the currency tick.
             .filter(player -> {
                 return player.getName().equals("Test");
             })
-            // Runs before the scoreboard sent for each player. The players depend on the `sendType`
+            // Runs before the scoreboard sent for each player. The players list depend on the `sendType`
             // Removes the player from the list that contains all listed players.
             .removeIf(player -> {
                 return player.getName().equals("ShouldRemove");
