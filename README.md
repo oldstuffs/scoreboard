@@ -45,9 +45,13 @@ final class TestScoreboard {
                 // You can use PlaceholderAPI plugin here.
                 return Arrays.asList("line 1", "line 2", player.getName());
             }))
-            //.sendType(SendType.lines(() -> {
-            //    return Arrays.asList("line 1", "line 2", "line 3");
-            //}))
+            .sendType(SendType.forEachOnlinePlayer(online -> {
+                // You can use PlaceholderAPI plugin here.
+                return Arrays.asList("line 1", "line 2", player.getName());
+            }))
+            .sendType(SendType.lines(() -> {
+                return Arrays.asList("line 1", "line 2", "line 3");
+            }))
             .startDelay(0L)
             .tick(10L)
             //.sendOnce() Disable the task and send the scoreboard for each player just for once.
