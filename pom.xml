@@ -2,28 +2,24 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <parent>
-        <artifactId>ppom</artifactId>
-        <groupId>io.github.portlek</groupId>
-        <version>2.2.0</version>
-    </parent>
-    <artifactId>scoreboard-parent</artifactId>
-    <version>1.0-SNAPSHOT</version>
-    <name>scoreboard-parent</name>
-    <packaging>pom</packaging>
-    <description>A simple scoreboard library for Minecraft plugins.</description>
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>io.github.portlek</groupId>
+    <artifactId>ppom</artifactId>
+    <version>2.4.0</version>
+  </parent>
+  <artifactId>scoreboard-parent</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
+  <name>parent</name>
+  <packaging>pom</packaging>
+  <description>A simple scoreboard library for Minecraft plugins.</description>
+  <url>https://github.com/portlek/scoreboard</url>
+  <scm>
     <url>https://github.com/portlek/scoreboard</url>
-
-    <scm>
-        <connection>scm:git:git://github.com/portlek/scoreboard.git</connection>
-        <developerConnection>scm:git:ssh://github.com/portlek/scoreboard.git</developerConnection>
-        <url>https://github.com/portlek/scoreboard</url>
-    </scm>
-
-    <modules>
-        <module>common</module>
-        <module>bukkit</module>
-    </modules>
-
+    <connection>scm:git:git://github.com/portlek/scoreboard.git</connection>
+    <developerConnection>scm:git:ssh://github.com/portlek/scoreboard.git</developerConnection>
+  </scm>
+  <modules>
+    <module>common</module>
+  </modules>
 </project>

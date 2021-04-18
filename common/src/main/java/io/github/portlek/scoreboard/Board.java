@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2020 Hasan Demirtaş
+ * Copyright (c) 2021 Hasan Demirtaş
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,114 +25,46 @@
 
 package io.github.portlek.scoreboard;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * a class that represents boards.
+ */
 @RequiredArgsConstructor
-public abstract class Board<O, P extends Plugin, B extends Board<O, P, B>> implements Self<B> {
+public final class Board {
 
-    private final Collection<Observer<O>> activeObserver = new ArrayList<>();
+  /**
+   * the id.
+   */
+  @NotNull
+  private final String id;
 
-    private final Collection<Predicate<Observer<O>>> filters = new ArrayList<>();
+  /**
+   * a class that represents builders for {@link Board}.
+   */
+  @Getter
+  public static final class Builder {
 
-    @NotNull
-    private final P plugin;
-
-    @NotNull
-    private Collection<Observer<O>> observers = new ArrayList<>();
-
-    @NotNull
-    private Predicate<Observer<O>> removeIf = observer -> false;
-
-    @NotNull
-    private Consumer<Observer<O>> runBefore = observer -> {
-    };
-
-    @NotNull
-    private Consumer<Observer<O>> runAfter = observer -> {
-    };
-
+    /**
+     * the id.
+     */
     @Nullable
-    private LineBuilder<O, P, B> lines;
+    private String id;
 
-    private long startDelay = 0L;
-
-    private long tick = 20L;
-
-    @SafeVarargs
+    /**
+     * sets the id.
+     *
+     * @param id the id to set.
+     *
+     * @return {@code this} for build chain.
+     */
     @NotNull
-    public final B addObserver(@NotNull final O... observers) {
-        this.observers.addAll(Arrays.asList(observers).stream().map(this::createObserver).collect(Collectors.toList()));
-        return this.self();
+    public Builder setId(final String id) {
+      this.id = id;
+      return this;
     }
-
-    @NotNull
-    public final B addObserver(@NotNull final List<O> observers) {
-        this.observers.addAll(observers.stream().map(this::createObserver).collect(Collectors.toList()));
-        return this.self();
-    }
-
-    @NotNull
-    public final B setObserver(@NotNull final Collection<O> observers) {
-        this.observers = observers.stream().map(this::createObserver).collect(Collectors.toList());
-        return this.self();
-    }
-
-    @NotNull
-    public final B filter(@NotNull final Predicate<Observer<O>> filter) {
-        this.filters.add(filter);
-        return this.self();
-    }
-
-    @NotNull
-    public final B removeIf(@NotNull final Predicate<Observer<O>> removeIf) {
-        this.removeIf = removeIf;
-        return this.self();
-    }
-
-    @NotNull
-    public final B runBefore(@NotNull final Consumer<Observer<O>> runBefore) {
-        this.runBefore = runBefore;
-        return this.self();
-    }
-
-    @NotNull
-    public final B runAfter(@NotNull final Consumer<Observer<O>> runAfter) {
-        this.runAfter = runAfter;
-        return this.self();
-    }
-
-    @NotNull
-    public final B startDelay(final long startDelay) {
-        this.startDelay = startDelay;
-        return this.self();
-    }
-
-    @NotNull
-    public final B tick(final long tick) {
-        this.tick = tick;
-        return this.self();
-    }
-
-    @NotNull
-    public final LineBuilder<O, P, B> newLineBuilder() {
-        return this.lines = new LineBuilder<>(this.self());
-    }
-
-    public final void start() {
-    }
-
-    public final void sendOnce() {
-    }
-
-    public abstract Observer<O> createObserver(@NotNull O observer);
-
+  }
 }
