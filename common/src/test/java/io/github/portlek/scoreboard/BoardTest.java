@@ -87,12 +87,12 @@ final class BoardTest {
     new Assertion<>(
       "Couldn't build the board correctly.",
       startDelay,
-      new IsEqual<>(20L)
+      new IsEqual<>(1000L)
     ).affirm();
     new Assertion<>(
       "Couldn't build the board correctly.",
       tick,
-      new IsEqual<>(20L)
+      new IsEqual<>(1000L)
     ).affirm();
     new Assertion<>(
       "Couldn't build the board correctly.",
