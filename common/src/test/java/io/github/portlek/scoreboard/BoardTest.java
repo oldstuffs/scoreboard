@@ -25,9 +25,12 @@
 
 package io.github.portlek.scoreboard;
 
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Executors;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 import org.hamcrest.core.IsEqual;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
@@ -40,21 +43,21 @@ final class BoardTest {
 
   @Test
   void createBoard() {
-    final var observer = new CommandSender() {
-    };
+    final var observer1 = new CommandSender("observer-1");
+    final var observer2 = new CommandSender("observer-2");
+    final var observer3 = new CommandSender("observer-3");
     final var originalScheduler = Executors.newScheduledThreadPool(4);
     final var board = Board.builder(CommandSender.class)
       .setId("test-scoreboard")
-      .addDynamicObservers(() -> observer)
-      .addStaticObservers(observer)
-      .setDynamicObservers(Set.of(() -> observer))
-      .setStaticObservers(Set.of(observer))
+      .setScoreboardSender(new ScoreboardSenderImpl())
+      .setDynamicObservers(Set.of(() -> observer2, () -> observer3))
+      .setStaticObservers(Set.of(observer1))
       .addFilters(sender -> true)
       .setFilters(Set.of(sender -> true))
       .addLines(Line.<CommandSender>builder()
         .setLineNumber(0)
         .build())
-      .setLines(List.of(Line.<CommandSender>builder()
+      .setLines(Set.of(Line.<CommandSender>builder()
         .setLineNumber(0)
         .build()))
       .setTick(50L * 20L)
@@ -122,7 +125,7 @@ final class BoardTest {
     new Assertion<>(
       "Couldn't build the board correctly.",
       dynamicObservers,
-      new HasSize(1)
+      new HasSize(2)
     ).affirm();
     new Assertion<>(
       "Couldn't build the board correctly.",
@@ -144,7 +147,7 @@ final class BoardTest {
       Board.getBoardById("test-scoreboard").isPresent(),
       new IsTrue()
     ).affirm();
-    board.close();
+    board.start();
   }
 
   @Test
@@ -161,10 +164,28 @@ final class BoardTest {
     );
   }
 
-  private interface CommandSender {
+  @ToString
+  @EqualsAndHashCode
+  @RequiredArgsConstructor
+  private static final class CommandSender {
 
-    default void sendMessages(@NotNull final String message) {
-      System.out.println(message);
+    @NotNull
+    @Getter
+    private final String name;
+
+    void sendMessages(@NotNull final String message) {
+      System.out.printf("%s:%s%n", this.name, message);
+    }
+  }
+
+  private static final class ScoreboardSenderImpl implements ScoreboardSender<CommandSender> {
+
+    @Override
+    public void close() {
+    }
+
+    @Override
+    public void send(@NotNull final Set<CommandSender> observers, @NotNull final Set<Line<CommandSender>> lines) {
     }
   }
 }

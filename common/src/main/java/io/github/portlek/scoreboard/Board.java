@@ -26,10 +26,8 @@
 package io.github.portlek.scoreboard;
 
 import java.io.Closeable;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -94,7 +92,7 @@ public final class Board<O> implements Closeable {
    * the lines.
    */
   @NotNull
-  private final List<Line<O>> lines;
+  private final Set<Line<O>> lines;
 
   /**
    * the mutable board.
@@ -125,6 +123,12 @@ public final class Board<O> implements Closeable {
    */
   @NotNull
   private final Set<Consumer<O>> runBefore;
+
+  /**
+   * the scoreboard sender.
+   */
+  @NotNull
+  private final ScoreboardSender<O> scoreboardSender;
 
   /**
    * the start delay.
@@ -187,7 +191,7 @@ public final class Board<O> implements Closeable {
   @Override
   public void close() {
     this.asyncScheduler.shutdown();
-    this.mutableBoard.get().close();
+    this.scoreboardSender.close();
   }
 
   /**
@@ -267,7 +271,7 @@ public final class Board<O> implements Closeable {
      * the lines.
      */
     @NotNull
-    private List<Line<O>> lines = new ArrayList<>();
+    private Set<Line<O>> lines = new HashSet<>();
 
     /**
      * the remove if.
@@ -286,6 +290,12 @@ public final class Board<O> implements Closeable {
      */
     @NotNull
     private Set<Consumer<O>> runBefore = new HashSet<>();
+
+    /**
+     * the scoreboard sender.
+     */
+    @NotNull
+    private ScoreboardSender<O> scoreboardSender = new ScoreboardSender.Empty<>();
 
     /**
      * the start delay.
@@ -346,7 +356,7 @@ public final class Board<O> implements Closeable {
     }
 
     /**
-     * adds the given remove if to the {@link #lines}.
+     * adds the given remove if to the {@link #removeIf}.
      *
      * @param removeIf the remove if to add.
      *
@@ -360,7 +370,7 @@ public final class Board<O> implements Closeable {
     }
 
     /**
-     * adds the given run after to the {@link #lines}.
+     * adds the given run after to the {@link #runAfter}.
      *
      * @param runAfter the run after to add.
      *
@@ -374,7 +384,7 @@ public final class Board<O> implements Closeable {
     }
 
     /**
-     * adds the given run before to the {@link #lines}.
+     * adds the given run before to the {@link #runBefore}.
      *
      * @param runBefore the run before to add.
      *
@@ -413,8 +423,8 @@ public final class Board<O> implements Closeable {
           this.id));
       }
       final var board = new Board<>(this.asyncScheduler, this.dynamicObservers, this.filters, this.id, this.lines,
-        this.observerClass, this.removeIf, this.runAfter, this.runBefore, this.startDelay, this.staticObservers,
-        this.tick);
+        this.observerClass, this.removeIf, this.runAfter, this.runBefore, this.scoreboardSender, this.startDelay,
+        this.staticObservers, this.tick);
       if (this.id != null) {
         Board.BOARDS.put(this.id, board);
       }
@@ -481,7 +491,7 @@ public final class Board<O> implements Closeable {
      * @return {@code this} for build chain.
      */
     @NotNull
-    public Builder<O> setLines(@NotNull final List<Line<O>> lines) {
+    public Builder<O> setLines(@NotNull final Set<Line<O>> lines) {
       this.lines = lines;
       return this;
     }
@@ -522,6 +532,19 @@ public final class Board<O> implements Closeable {
     @NotNull
     public Builder<O> setRunBefore(@NotNull final Set<Consumer<O>> runBefore) {
       this.runBefore = runBefore;
+      return this;
+    }
+
+    /**
+     * sets the scoreboard sender.
+     *
+     * @param scoreboardSender the scoreboard sender to set.
+     *
+     * @return {@code this} for build chaining.
+     */
+    @NotNull
+    public Builder<O> setScoreboardSender(@NotNull final ScoreboardSender<O> scoreboardSender) {
+      this.scoreboardSender = scoreboardSender;
       return this;
     }
 
@@ -580,7 +603,7 @@ public final class Board<O> implements Closeable {
    *
    * @param <O> type of the observers.
    */
-  private static final class MutableBoard<O> implements Closeable {
+  private static final class MutableBoard<O> {
 
     /**
      * the board.
@@ -604,10 +627,6 @@ public final class Board<O> implements Closeable {
       this.staticObservers = new HashSet<>(board.getStaticObservers());
     }
 
-    @Override
-    public void close() {
-    }
-
     /**
      * sends the {@link #board} to the all observers.
      */
@@ -615,8 +634,7 @@ public final class Board<O> implements Closeable {
       this.staticObserversRemoveIf();
       final var observers = this.getObservers();
       this.board.getRunBefore().forEach(observers::forEach);
-      for (final var line : this.board.getLines()) {
-      }
+      this.board.getScoreboardSender().send(observers, this.board.getLines());
       this.board.getRunAfter().forEach(observers::forEach);
     }
 
