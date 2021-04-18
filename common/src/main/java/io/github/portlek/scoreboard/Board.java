@@ -25,6 +25,7 @@
 
 package io.github.portlek.scoreboard;
 
+import java.io.Closeable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -55,7 +56,7 @@ import org.jetbrains.annotations.Nullable;
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class Board<O> implements AutoCloseable {
+public final class Board<O> implements Closeable {
 
   /**
    * the boards.
@@ -176,6 +177,7 @@ public final class Board<O> implements AutoCloseable {
 
   @Override
   public void close() {
+    this.scheduler.shutdown();
   }
 
   /**

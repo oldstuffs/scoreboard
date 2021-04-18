@@ -34,6 +34,7 @@ import org.junit.jupiter.api.Test;
 import org.llorllale.cactoos.matchers.Assertion;
 import org.llorllale.cactoos.matchers.HasSize;
 import org.llorllale.cactoos.matchers.IsTrue;
+import org.llorllale.cactoos.matchers.Throws;
 
 final class BoardTest {
 
@@ -143,6 +144,21 @@ final class BoardTest {
       Board.getBoardById("test-scoreboard").isPresent(),
       new IsTrue()
     ).affirm();
+    board.close();
+  }
+
+  @Test
+  void creatingBoardTwice() {
+    Board.builder(CommandSender.class)
+      .setId("test")
+      .build();
+    new Assertion<>(
+      "Board with the same id created.",
+      () -> Board.builder(CommandSender.class)
+        .setId("test")
+        .build(),
+      new Throws<>(IllegalArgumentException.class)
+    );
   }
 
   private interface CommandSender {
