@@ -28,6 +28,7 @@ package io.github.portlek.scoreboard;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -53,6 +54,12 @@ public final class Board<O> {
    */
   @NotNull
   private final Set<Supplier<O>> dynamicObservers;
+
+  /**
+   * the filters.
+   */
+  @NotNull
+  private final Set<Predicate<O>> filters;
 
   /**
    * the id.
@@ -107,6 +114,12 @@ public final class Board<O> {
     private Set<Supplier<O>> dynamicObservers = new HashSet<>();
 
     /**
+     * the filters.
+     */
+    @NotNull
+    private Set<Predicate<O>> filters = new HashSet<>();
+
+    /**
      * the id.
      */
     @Nullable
@@ -133,6 +146,20 @@ public final class Board<O> {
     }
 
     /**
+     * adds the given filters to the {@link #filters}.
+     *
+     * @param filters the filters to add.
+     *
+     * @return {@code this} for builder chain.
+     */
+    @SafeVarargs
+    @NotNull
+    public final Builder<O> addFilters(@NotNull final Predicate<O>... filters) {
+      Collections.addAll(this.filters, filters);
+      return this;
+    }
+
+    /**
      * adds the given static observers to the {@link #staticObservers}.
      *
      * @param observers the observers to add.
@@ -153,7 +180,7 @@ public final class Board<O> {
      */
     @NotNull
     public Board<O> build() {
-      return new Board<>(this.dynamicObservers, this.id, this.observerClass, this.staticObservers);
+      return new Board<>(this.dynamicObservers, this.filters, this.id, this.observerClass, this.staticObservers);
     }
 
     /**
@@ -166,6 +193,19 @@ public final class Board<O> {
     @NotNull
     public Builder<O> setDynamicObservers(@NotNull final Set<Supplier<O>> dynamicObservers) {
       this.dynamicObservers = dynamicObservers;
+      return this;
+    }
+
+    /**
+     * sets the filters.
+     *
+     * @param filters the filters to set.
+     *
+     * @return {@code this} for build chain.
+     */
+    @NotNull
+    public Builder<O> setFilters(@NotNull final Set<Predicate<O>> filters) {
+      this.filters = filters;
       return this;
     }
 

@@ -43,9 +43,12 @@ final class BoardTest {
       .addStaticObservers(observer)
       .setDynamicObservers(Set.of(() -> observer))
       .setStaticObservers(Set.of(observer))
+      .addFilters(sender -> true)
+      .setFilters(Set.of(sender -> true))
       .build();
     final var id = board.getId();
     final var dynamicObservers = board.getDynamicObservers();
+    final var filters = board.getFilters();
     final var staticObservers = board.getStaticObservers();
     final var observerClass = board.getObserverClass();
     new Assertion<>(
@@ -61,6 +64,11 @@ final class BoardTest {
     new Assertion<>(
       "Couldn't build the board correctly.",
       staticObservers,
+      new HasSize(1)
+    ).affirm();
+    new Assertion<>(
+      "Couldn't build the board correctly.",
+      filters,
       new HasSize(1)
     ).affirm();
     new Assertion<>(
