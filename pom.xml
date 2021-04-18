@@ -19,6 +19,9 @@
     <connection>scm:git:git://github.com/portlek/scoreboard.git</connection>
     <developerConnection>scm:git:ssh://github.com/portlek/scoreboard.git</developerConnection>
   </scm>
+  <properties>
+    <java.version>11</java.version>
+  </properties>
   <modules>
     <module>common</module>
   </modules>
