@@ -374,6 +374,10 @@ public final class Board<O> implements AutoCloseable {
      */
     @NotNull
     public Board<O> build() {
+      if (this.id != null && Board.BOARDS.containsKey(this.id)) {
+        throw new IllegalArgumentException(String.format("Id called %s is already exist in the boards map.",
+          this.id));
+      }
       final var board = new Board<>(this.dynamicObservers, this.filters, this.id, this.lines, this.observerClass,
         this.removeIf, this.runAfter, this.runBefore, this.scheduler, this.startDelay, this.staticObservers, this.tick);
       if (this.id != null) {
