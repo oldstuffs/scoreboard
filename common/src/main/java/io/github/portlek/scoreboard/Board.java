@@ -36,6 +36,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -190,6 +191,7 @@ public final class Board<O> implements Closeable {
    * starts the scoreboard sequence.
    */
   public void start() {
+    this.scheduler.scheduleAtFixedRate(this::sendOnce, this.startDelay, this.tick, TimeUnit.MILLISECONDS);
   }
 
   /**
