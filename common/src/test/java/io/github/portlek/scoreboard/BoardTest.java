@@ -57,15 +57,15 @@ final class BoardTest {
       .setLines(List.of(Line.<CommandSender>builder()
         .setLineNumber(0)
         .build()))
-      .setTick(20L)
-      .setStartDelay(20L)
+      .setTick(50L * 20L)
+      .setStartDelay(50L * 20L)
       .addRemoveIf(sender -> false)
       .setRemoveIf(Set.of(sender -> false))
       .addRunBefore(sender -> sender.sendMessages("runs before."))
       .setRunBefore(Set.of(sender -> sender.sendMessages("runs before.")))
       .addRunAfter(sender -> sender.sendMessages("runs after."))
       .setRunAfter(Set.of(sender -> sender.sendMessages("runs after.")))
-      .setScheduler(originalScheduler)
+      .setAsyncScheduler(originalScheduler)
       .build();
     final var id = board.getId();
     final var dynamicObservers = board.getDynamicObservers();
@@ -77,7 +77,7 @@ final class BoardTest {
     final var removeIf = board.getRemoveIf();
     final var runBefore = board.getRunBefore();
     final var runAfter = board.getRunAfter();
-    final var scheduler = board.getScheduler();
+    final var scheduler = board.getAsyncScheduler();
     final var observerClass = board.getObserverClass();
     new Assertion<>(
       "Couldn't build the board correctly.",

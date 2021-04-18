@@ -40,10 +40,12 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Synchronized;
 import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -63,6 +65,12 @@ public final class Board<O> implements Closeable {
    * the boards.
    */
   private static final Map<String, Board<?>> BOARDS = new ConcurrentHashMap<>();
+
+  /**
+   * the async scheduler.
+   */
+  @NotNull
+  private final ScheduledExecutorService asyncScheduler;
 
   /**
    * the dynamic observers.
@@ -89,6 +97,12 @@ public final class Board<O> implements Closeable {
   private final List<Line<O>> lines;
 
   /**
+   * the mutable board.
+   */
+  private final ThreadLocal<MutableBoard<O>> mutableBoard = ThreadLocal.withInitial(() ->
+    new MutableBoard<>(this));
+
+  /**
    * the observer class.
    */
   @NotNull
@@ -111,12 +125,6 @@ public final class Board<O> implements Closeable {
    */
   @NotNull
   private final Set<Consumer<O>> runBefore;
-
-  /**
-   * the scheduler.
-   */
-  @NotNull
-  private final ScheduledExecutorService scheduler;
 
   /**
    * the start delay.
@@ -178,20 +186,42 @@ public final class Board<O> implements Closeable {
 
   @Override
   public void close() {
-    this.scheduler.shutdown();
+    this.asyncScheduler.shutdown();
+    this.mutableBoard.get().close();
+  }
+
+  /**
+   * resets the {@link #mutableBoard}.
+   */
+  public void reset() {
+    this.mutableBoard.set(new MutableBoard<>(this));
   }
 
   /**
    * sends the scoreboard for once.
    */
-  public void sendOnce() {
+  public void send() {
+    this.send(false);
+  }
+
+  /**
+   * sends the scoreboard for once.
+   *
+   * @param reset the reset to send.
+   */
+  public void send(final boolean reset) {
+    if (reset) {
+      this.reset();
+    }
+    this.mutableBoard.get().send();
   }
 
   /**
    * starts the scoreboard sequence.
    */
   public void start() {
-    this.scheduler.scheduleAtFixedRate(this::sendOnce, this.startDelay, this.tick, TimeUnit.MILLISECONDS);
+    this.reset();
+    this.asyncScheduler.scheduleAtFixedRate(this::send, this.startDelay, this.tick, TimeUnit.MILLISECONDS);
   }
 
   /**
@@ -208,6 +238,12 @@ public final class Board<O> implements Closeable {
      */
     @NotNull
     private final Class<O> observerClass;
+
+    /**
+     * the async scheduler.
+     */
+    @NotNull
+    private ScheduledExecutorService asyncScheduler = Executors.newScheduledThreadPool(2);
 
     /**
      * the dynamic observers.
@@ -252,15 +288,9 @@ public final class Board<O> implements Closeable {
     private Set<Consumer<O>> runBefore = new HashSet<>();
 
     /**
-     * the scheduler.
-     */
-    @NotNull
-    private ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(2);
-
-    /**
      * the start delay.
      */
-    private long startDelay = 20L;
+    private long startDelay = 1000L;
 
     /**
      * the static observers.
@@ -271,7 +301,7 @@ public final class Board<O> implements Closeable {
     /**
      * the tick.
      */
-    private long tick = 20L;
+    private long tick = 1000L;
 
     /**
      * adds the given dynamic observers to the {@link #dynamicObservers}.
@@ -382,12 +412,26 @@ public final class Board<O> implements Closeable {
         throw new IllegalArgumentException(String.format("Id called %s is already exist in the boards map.",
           this.id));
       }
-      final var board = new Board<>(this.dynamicObservers, this.filters, this.id, this.lines, this.observerClass,
-        this.removeIf, this.runAfter, this.runBefore, this.scheduler, this.startDelay, this.staticObservers, this.tick);
+      final var board = new Board<>(this.asyncScheduler, this.dynamicObservers, this.filters, this.id, this.lines,
+        this.observerClass, this.removeIf, this.runAfter, this.runBefore, this.startDelay, this.staticObservers,
+        this.tick);
       if (this.id != null) {
         Board.BOARDS.put(this.id, board);
       }
       return board;
+    }
+
+    /**
+     * sets the async scheduler.
+     *
+     * @param asyncScheduler the async scheduler to set.
+     *
+     * @return {@code this} for builder chain.
+     */
+    @NotNull
+    public Builder<O> setAsyncScheduler(@NotNull final ScheduledExecutorService asyncScheduler) {
+      this.asyncScheduler = asyncScheduler;
+      return this;
     }
 
     /**
@@ -482,19 +526,6 @@ public final class Board<O> implements Closeable {
     }
 
     /**
-     * sets the scheduler.
-     *
-     * @param scheduler the scheduler to set.
-     *
-     * @return {@code this} for builder chain.
-     */
-    @NotNull
-    public Builder<O> setScheduler(@NotNull final ScheduledExecutorService scheduler) {
-      this.scheduler = scheduler;
-      return this;
-    }
-
-    /**
      * sets the start delay.
      *
      * @param startDelay the start delay to set.
@@ -541,6 +572,84 @@ public final class Board<O> implements Closeable {
       }
       this.tick = tick;
       return this;
+    }
+  }
+
+  /**
+   * a class that represents mutable boards.
+   *
+   * @param <O> type of the observers.
+   */
+  private static final class MutableBoard<O> implements Closeable {
+
+    /**
+     * the board.
+     */
+    @NotNull
+    private final Board<O> board;
+
+    /**
+     * the static observers.
+     */
+    @NotNull
+    private final Set<O> staticObservers;
+
+    /**
+     * ctor.
+     *
+     * @param board the board.
+     */
+    private MutableBoard(@NotNull final Board<O> board) {
+      this.board = board;
+      this.staticObservers = new HashSet<>(board.getStaticObservers());
+    }
+
+    @Override
+    public void close() {
+    }
+
+    /**
+     * sends the {@link #board} to the all observers.
+     */
+    public void send() {
+      this.staticObserversRemoveIf();
+      final var observers = this.getObservers();
+      this.board.getRunBefore().forEach(observers::forEach);
+      for (final var line : this.board.getLines()) {
+      }
+      this.board.getRunAfter().forEach(observers::forEach);
+    }
+
+    /**
+     * obtains the observers.
+     *
+     * @return observers.
+     */
+    @NotNull
+    @Synchronized("staticObservers")
+    private Set<O> getObservers() {
+      final var observers = this.staticObservers.stream()
+        .filter(observer ->
+          this.board.getFilters().stream()
+            .anyMatch(predicate -> predicate.test(observer)))
+        .collect(Collectors.toSet());
+      this.board.getDynamicObservers().stream()
+        .map(Supplier::get)
+        .filter(observer ->
+          this.board.getFilters().stream()
+            .anyMatch(predicate -> predicate.test(observer)))
+        .forEach(observers::add);
+      return observers;
+    }
+
+    /**
+     * removes each {@link #staticObservers} if the observer passes {@link Board#getRemoveIf()}.
+     */
+    @Synchronized("staticObservers")
+    private void staticObserversRemoveIf() {
+      this.staticObservers.removeIf(observer ->
+        this.board.getRemoveIf().stream()
+          .anyMatch(predicate -> predicate.test(observer)));
     }
   }
 }
