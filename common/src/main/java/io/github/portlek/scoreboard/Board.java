@@ -25,9 +25,17 @@
 
 package io.github.portlek.scoreboard;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import lombok.AccessLevel;
@@ -47,7 +55,12 @@ import org.jetbrains.annotations.Nullable;
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class Board<O> {
+public final class Board<O> implements AutoCloseable {
+
+  /**
+   * the boards.
+   */
+  private static final Map<String, Board<?>> BOARDS = new ConcurrentHashMap<>();
 
   /**
    * the dynamic observers.
@@ -68,16 +81,56 @@ public final class Board<O> {
   private final String id;
 
   /**
+   * the lines.
+   */
+  @NotNull
+  private final List<Line<O>> lines;
+
+  /**
    * the observer class.
    */
   @NotNull
   private final Class<O> observerClass;
 
   /**
+   * the remove if.
+   */
+  @NotNull
+  private final Set<Predicate<O>> removeIf;
+
+  /**
+   * the run after.
+   */
+  @NotNull
+  private final Set<Consumer<O>> runAfter;
+
+  /**
+   * the run before.
+   */
+  @NotNull
+  private final Set<Consumer<O>> runBefore;
+
+  /**
+   * the scheduler.
+   */
+  @NotNull
+  private final ScheduledExecutorService scheduler;
+
+  /**
+   * the start delay.
+   */
+  private final long startDelay;
+
+  /**
    * the static observers.
    */
   @NotNull
   private final Set<O> staticObservers;
+
+  /**
+   * the tick.
+   */
+  private final long tick;
 
   /**
    * creates a new instance of {@link Builder}.
@@ -90,6 +143,51 @@ public final class Board<O> {
   @NotNull
   public static <O> Builder<O> builder(@NotNull final Class<O> observerClass) {
     return new Builder<>(observerClass);
+  }
+
+  /**
+   * obtains the board by id.
+   *
+   * @param id the id to obtain.
+   *
+   * @return board.
+   */
+  @NotNull
+  public static Optional<Board<?>> getBoardById(@NotNull final String id) {
+    return Optional.ofNullable(Board.BOARDS.get(id));
+  }
+
+  /**
+   * obtains the by id and observer class.
+   *
+   * @param observerClass the observer class to obtain.
+   * @param id the id to obtain.
+   * @param <O> type of the observers.
+   *
+   * @return board.
+   */
+  @NotNull
+  public static <O> Optional<Board<O>> getBoardById(@NotNull final Class<O> observerClass, @NotNull final String id) {
+    //noinspection unchecked
+    return Board.getBoardById(id)
+      .filter(board -> observerClass.isAssignableFrom(board.getObserverClass()))
+      .map(board -> (Board<O>) board);
+  }
+
+  @Override
+  public void close() {
+  }
+
+  /**
+   * sends the scoreboard for once.
+   */
+  public void sendOnce() {
+  }
+
+  /**
+   * starts the scoreboard sequence.
+   */
+  public void start() {
   }
 
   /**
@@ -126,10 +224,50 @@ public final class Board<O> {
     private String id;
 
     /**
+     * the lines.
+     */
+    @NotNull
+    private List<Line<O>> lines = new ArrayList<>();
+
+    /**
+     * the remove if.
+     */
+    @NotNull
+    private Set<Predicate<O>> removeIf = new HashSet<>();
+
+    /**
+     * the run after.
+     */
+    @NotNull
+    private Set<Consumer<O>> runAfter = new HashSet<>();
+
+    /**
+     * the run before.
+     */
+    @NotNull
+    private Set<Consumer<O>> runBefore = new HashSet<>();
+
+    /**
+     * the scheduler.
+     */
+    @NotNull
+    private ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(2);
+
+    /**
+     * the start delay.
+     */
+    private long startDelay = 20L;
+
+    /**
      * the static observers.
      */
     @NotNull
     private Set<O> staticObservers = new HashSet<>();
+
+    /**
+     * the tick.
+     */
+    private long tick = 20L;
 
     /**
      * adds the given dynamic observers to the {@link #dynamicObservers}.
@@ -160,6 +298,62 @@ public final class Board<O> {
     }
 
     /**
+     * adds the given lines to the {@link #lines}.
+     *
+     * @param lines the lines to add.
+     *
+     * @return {@code this} for builder chain.
+     */
+    @SafeVarargs
+    @NotNull
+    public final Builder<O> addLines(@NotNull final Line<O>... lines) {
+      Collections.addAll(this.lines, lines);
+      return this;
+    }
+
+    /**
+     * adds the given remove if to the {@link #lines}.
+     *
+     * @param removeIf the remove if to add.
+     *
+     * @return {@code this} for builder chain.
+     */
+    @SafeVarargs
+    @NotNull
+    public final Builder<O> addRemoveIf(@NotNull final Predicate<O>... removeIf) {
+      Collections.addAll(this.removeIf, removeIf);
+      return this;
+    }
+
+    /**
+     * adds the given run after to the {@link #lines}.
+     *
+     * @param runAfter the run after to add.
+     *
+     * @return {@code this} for builder chain.
+     */
+    @SafeVarargs
+    @NotNull
+    public final Builder<O> addRunAfter(@NotNull final Consumer<O>... runAfter) {
+      Collections.addAll(this.runAfter, runAfter);
+      return this;
+    }
+
+    /**
+     * adds the given run before to the {@link #lines}.
+     *
+     * @param runBefore the run before to add.
+     *
+     * @return {@code this} for builder chain.
+     */
+    @SafeVarargs
+    @NotNull
+    public final Builder<O> addRunBefore(@NotNull final Consumer<O>... runBefore) {
+      Collections.addAll(this.runBefore, runBefore);
+      return this;
+    }
+
+    /**
      * adds the given static observers to the {@link #staticObservers}.
      *
      * @param observers the observers to add.
@@ -180,7 +374,12 @@ public final class Board<O> {
      */
     @NotNull
     public Board<O> build() {
-      return new Board<>(this.dynamicObservers, this.filters, this.id, this.observerClass, this.staticObservers);
+      final var board = new Board<>(this.dynamicObservers, this.filters, this.id, this.lines, this.observerClass,
+        this.removeIf, this.runAfter, this.runBefore, this.scheduler, this.startDelay, this.staticObservers, this.tick);
+      if (this.id != null) {
+        Board.BOARDS.put(this.id, board);
+      }
+      return board;
     }
 
     /**
@@ -223,6 +422,89 @@ public final class Board<O> {
     }
 
     /**
+     * sets the lines.
+     *
+     * @param lines the lines to set.
+     *
+     * @return {@code this} for build chain.
+     */
+    @NotNull
+    public Builder<O> setLines(@NotNull final List<Line<O>> lines) {
+      this.lines = lines;
+      return this;
+    }
+
+    /**
+     * sets the remove if.
+     *
+     * @param removeIf the remove if to set.
+     *
+     * @return {@code this} for builder chain.
+     */
+    @NotNull
+    public Builder<O> setRemoveIf(@NotNull final Set<Predicate<O>> removeIf) {
+      this.removeIf = removeIf;
+      return this;
+    }
+
+    /**
+     * sets the run after.
+     *
+     * @param runAfter the run after to set.
+     *
+     * @return {@code this} for builder chain.
+     */
+    @NotNull
+    public Builder<O> setRunAfter(@NotNull final Set<Consumer<O>> runAfter) {
+      this.runAfter = runAfter;
+      return this;
+    }
+
+    /**
+     * sets the run before.
+     *
+     * @param runBefore the run before to set.
+     *
+     * @return {@code this} for builder chain.
+     */
+    @NotNull
+    public Builder<O> setRunBefore(@NotNull final Set<Consumer<O>> runBefore) {
+      this.runBefore = runBefore;
+      return this;
+    }
+
+    /**
+     * sets the scheduler.
+     *
+     * @param scheduler the scheduler to set.
+     *
+     * @return {@code this} for builder chain.
+     */
+    @NotNull
+    public Builder<O> setScheduler(@NotNull final ScheduledExecutorService scheduler) {
+      this.scheduler = scheduler;
+      return this;
+    }
+
+    /**
+     * sets the start delay.
+     *
+     * @param startDelay the start delay to set.
+     *
+     * @return {@code this} for build chain.
+     *
+     * @throws IllegalArgumentException if the start delay is lower than 0.
+     */
+    @NotNull
+    public Builder<O> setStartDelay(final long startDelay) {
+      if (startDelay < 0L) {
+        throw new IllegalArgumentException("Start delay shouldn't less than 0.");
+      }
+      this.startDelay = startDelay;
+      return this;
+    }
+
+    /**
      * sets the static observers.
      *
      * @param staticObservers the static observers to set.
@@ -232,6 +514,24 @@ public final class Board<O> {
     @NotNull
     public Builder<O> setStaticObservers(@NotNull final Set<O> staticObservers) {
       this.staticObservers = staticObservers;
+      return this;
+    }
+
+    /**
+     * sets the tick.
+     *
+     * @param tick the tick to set.
+     *
+     * @return {@code this} for build chain.
+     *
+     * @throws IllegalArgumentException if the tick is lower than 0.
+     */
+    @NotNull
+    public Builder<O> setTick(final long tick) {
+      if (tick <= 0L) {
+        throw new IllegalArgumentException("Tick shouldn't equal or less than 0.");
+      }
+      this.tick = tick;
       return this;
     }
   }
