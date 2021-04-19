@@ -76,6 +76,12 @@ public final class Board<O> implements Closeable {
   private final ScheduledExecutorService asyncScheduler;
 
   /**
+   * the dynamic observer list.
+   */
+  @NotNull
+  private final Collection<Supplier<Collection<O>>> dynamicObserverList;
+
+  /**
    * the dynamic observers.
    */
   @NotNull
@@ -268,6 +274,12 @@ public final class Board<O> implements Closeable {
     private ScheduledExecutorService asyncScheduler = Executors.newScheduledThreadPool(2);
 
     /**
+     * the dynamic observer list.
+     */
+    @NotNull
+    private Collection<Supplier<Collection<O>>> dynamicObserverList = new HashSet<>();
+
+    /**
      * the dynamic observers.
      */
     @NotNull
@@ -344,16 +356,30 @@ public final class Board<O> implements Closeable {
     private BoardType type = BoardType.MODERN;
 
     /**
-     * adds the given dynamic observers to the {@link #dynamicObservers}.
+     * adds the given dynamic observer list to the {@link #dynamicObserverList}.
      *
-     * @param observers the observers to add.
+     * @param dynamicObserverList the dynamic observer list to add.
      *
      * @return {@code this} for builder chain.
      */
     @SafeVarargs
     @NotNull
-    public final Builder<O> addDynamicObservers(@NotNull final Supplier<O>... observers) {
-      Collections.addAll(this.dynamicObservers, observers);
+    public final Builder<O> addDynamicObserverList(@NotNull final Supplier<Collection<O>>... dynamicObserverList) {
+      Collections.addAll(this.dynamicObserverList, dynamicObserverList);
+      return this;
+    }
+
+    /**
+     * adds the given dynamic observers to the {@link #dynamicObservers}.
+     *
+     * @param dynamicObservers the dynamic observers to add.
+     *
+     * @return {@code this} for builder chain.
+     */
+    @SafeVarargs
+    @NotNull
+    public final Builder<O> addDynamicObservers(@NotNull final Supplier<O>... dynamicObservers) {
+      Collections.addAll(this.dynamicObservers, dynamicObservers);
       return this;
     }
 
@@ -442,6 +468,19 @@ public final class Board<O> implements Closeable {
     }
 
     /**
+     * sets the dynamic observer list.
+     *
+     * @param dynamicObserverList the dynamic observer list to set.
+     *
+     * @return {@code this} for build chain.
+     */
+    @SafeVarargs
+    @NotNull
+    public final Builder<O> setDynamicObserverList(@NotNull final Supplier<Collection<O>>... dynamicObserverList) {
+      return this.setDynamicObserverList(Set.of(dynamicObserverList));
+    }
+
+    /**
      * sets the dynamic observers.
      *
      * @param dynamicObservers the dynamic observers to set.
@@ -505,9 +544,9 @@ public final class Board<O> implements Closeable {
         throw new IllegalArgumentException(String.format("Id called %s is already exist in the boards map.",
           this.id));
       }
-      final var board = new Board<>(this.asyncScheduler, this.dynamicObservers, this.filters, this.id, this.lines,
-        this.observerClass, this.removeIf, this.runAfter, this.runBefore, this.scoreboardSender, this.startDelay,
-        this.staticObservers, this.tick, this.titleLine, this.type);
+      final var board = new Board<>(this.asyncScheduler, this.dynamicObserverList, this.dynamicObservers, this.filters,
+        this.id, this.lines, this.observerClass, this.removeIf, this.runAfter, this.runBefore, this.scoreboardSender,
+        this.startDelay, this.staticObservers, this.tick, this.titleLine, this.type);
       if (this.id != null) {
         Board.BOARDS.put(this.id, board);
       }
@@ -524,6 +563,19 @@ public final class Board<O> implements Closeable {
     @NotNull
     public Builder<O> setAsyncScheduler(@NotNull final ScheduledExecutorService asyncScheduler) {
       this.asyncScheduler = asyncScheduler;
+      return this;
+    }
+
+    /**
+     * sets the dynamic observer list.
+     *
+     * @param dynamicObserverList the dynamic observer list to set.
+     *
+     * @return {@code this} for build chain.
+     */
+    @NotNull
+    public Builder<O> setDynamicObserverList(@NotNull final Collection<Supplier<Collection<O>>> dynamicObserverList) {
+      this.dynamicObserverList = dynamicObserverList;
       return this;
     }
 
@@ -762,6 +814,13 @@ public final class Board<O> implements Closeable {
         .collect(Collectors.toSet());
       this.board.getDynamicObservers().stream()
         .map(Supplier::get)
+        .filter(observer ->
+          this.board.getFilters().stream()
+            .anyMatch(predicate -> predicate.test(observer)))
+        .forEach(observers::add);
+      this.board.getDynamicObserverList().stream()
+        .map(Supplier::get)
+        .flatMap(Collection::stream)
         .filter(observer ->
           this.board.getFilters().stream()
             .anyMatch(predicate -> predicate.test(observer)))
