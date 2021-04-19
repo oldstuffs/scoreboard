@@ -25,11 +25,8 @@
 
 package io.github.portlek.scoreboard.line;
 
-import io.github.portlek.scoreboard.Board;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Collectors;
 import org.hamcrest.core.IsEqual;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
@@ -72,8 +69,7 @@ final class LineTest {
     new Assertion<>(
       "Couldn't build the line.",
       printed.get(),
-      new IsEqual<>("observer-1")
-    );
+      new IsEqual<>("observer-1"));
   }
 
   @Test
@@ -84,7 +80,6 @@ final class LineTest {
     new Assertion<>(
       "Couldn't build the line.",
       printed.get(),
-      new IsEqual<>("observer-1")
-    );
+      new IsEqual<>("observer-1"));
   }
 }
