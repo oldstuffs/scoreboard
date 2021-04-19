@@ -52,6 +52,19 @@ public interface Line<O> extends Function<@NotNull O, @NotNull String>, Closeabl
     return new Impl<>(line);
   }
 
+  /**
+   * creates a simple line instance.
+   *
+   * @param line the line to create.
+   * @param <O> type of the observers.
+   *
+   * @return a newly created line instance.
+   */
+  @NotNull
+  static <O> Line<O> simple(@NotNull final String line) {
+    return new Impl<>(observer -> line);
+  }
+
   @Override
   default void close() {
   }

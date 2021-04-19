@@ -27,9 +27,8 @@ package io.github.portlek.scoreboard.line;
 
 import io.github.portlek.scoreboard.Board;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Function;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import org.hamcrest.core.IsEqual;
 import org.jetbrains.annotations.NotNull;
@@ -65,42 +64,27 @@ final class LineTest {
 
   @Test
   void line() {
-    final var observer1 = "observer-1";
-    final var observer2 = "observer-2";
-    final var observer3 = "observer-3";
-    final var board = Board.newBuilder(String.class)
-      .setId("test-board")
-      .addLines(Line.line(Function.identity()))
-      .build();
-    final var keys = board.getLines().keySet();
-    final var forObserver1 = board.getLines().values().stream()
-      .map(line -> line.apply(observer1))
-      .collect(Collectors.toList());
-    final var forObserver2 = board.getLines().values().stream()
-      .map(line -> line.apply(observer2))
-      .collect(Collectors.toList());
-    final var forObserver3 = board.getLines().values().stream()
-      .map(line -> line.apply(observer3))
-      .collect(Collectors.toList());
+    final var printed = new AtomicReference<String>();
+    final var line = Line.line(observer -> {
+      return "observer-1";
+    });
+    printed.set(line.apply("null"));
     new Assertion<>(
-      "Couldn't create the line correctly.",
-      keys,
-      new IsEqual<>(Set.of(0))
-    ).affirm();
+      "Couldn't build the line.",
+      printed.get(),
+      new IsEqual<>("observer-1")
+    );
+  }
+
+  @Test
+  void simple() {
+    final var printed = new AtomicReference<String>();
+    final var line = Line.simple("observer-1");
+    printed.set(line.apply("null"));
     new Assertion<>(
-      "Couldn't create the line correctly.",
-      forObserver1,
-      new IsEqual<>(List.of("observer-1"))
-    ).affirm();
-    new Assertion<>(
-      "Couldn't create the line correctly.",
-      forObserver2,
-      new IsEqual<>(List.of("observer-2"))
-    ).affirm();
-    new Assertion<>(
-      "Couldn't create the line correctly.",
-      forObserver3,
-      new IsEqual<>(List.of("observer-3"))
-    ).affirm();
+      "Couldn't build the line.",
+      printed.get(),
+      new IsEqual<>("observer-1")
+    );
   }
 }
