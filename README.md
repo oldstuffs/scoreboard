@@ -6,7 +6,6 @@
 ## How to use
 
 ```xml
-
 <dependency>
   <groupId>io.github.portlek</groupId>
   <artifactId>scoreboard-common</artifactId>
