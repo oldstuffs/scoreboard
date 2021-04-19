@@ -376,6 +376,7 @@ public final class BukkitPlayerScoreboard implements Closeable {
      *
      * @param position the position to send.
      */
+    @Synchronized("team")
     private void send(final int position) {
       if (this.team == null) {
         return;
@@ -415,10 +416,9 @@ public final class BukkitPlayerScoreboard implements Closeable {
      */
     private void setup() {
       this.scoreboard.getScoreboard().ifPresent(score -> {
-        var teamName = this.identifier;
-        if (teamName.length() > 16) {
-          teamName = teamName.substring(0, 16);
-        }
+        final var teamName = this.identifier.length() > 16
+          ? this.identifier.substring(0, 16)
+          : this.identifier;
         var team = score.getTeam(teamName);
         if (team == null) {
           team = score.registerNewTeam(teamName);
