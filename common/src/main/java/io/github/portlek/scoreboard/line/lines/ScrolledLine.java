@@ -82,7 +82,7 @@ public abstract class ScrolledLine<O> extends FramedLine<O> {
   protected ScrolledLine(@NotNull final String message, final int spaceBetween, final int width,
                          @NotNull final LineColor color) {
     super(new ArrayList<>());
-    this.message = message;
+    this.message = color.format(message);
     this.spaceBetween = spaceBetween;
     this.width = width;
     this.color = color;
@@ -95,15 +95,17 @@ public abstract class ScrolledLine<O> extends FramedLine<O> {
     if (sb.charAt(sb.length() - 1) == this.color.getColorChar()) {
       sb.setCharAt(sb.length() - 1, ' ');
     }
-    if (sb.charAt(0) == this.color.getColorChar()) {
-      final var c = this.color.getByChar(sb.charAt(1));
-      if (c != null) {
-        this.color = c;
-        sb = this.generateNextBuilder();
-        if (sb.charAt(0) != ' ') {
-          sb.setCharAt(0, ' ');
-        }
-      }
+    if (sb.charAt(0) != this.color.getColorChar()) {
+      return this.color.toString() + sb;
+    }
+    final var charAt = this.color.getByChar(sb.charAt(1));
+    if (charAt == null) {
+      return this.color.toString() + sb;
+    }
+    this.color = charAt;
+    sb = this.generateNextBuilder();
+    if (sb.charAt(0) != ' ') {
+      sb.setCharAt(0, ' ');
     }
     return this.color.toString() + sb;
   }

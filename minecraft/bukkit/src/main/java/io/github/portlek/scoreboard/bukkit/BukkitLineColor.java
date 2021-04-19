@@ -54,6 +54,12 @@ public final class BukkitLineColor implements LineColor {
     return new BukkitLineColor(ChatColor.RESET);
   }
 
+  @NotNull
+  @Override
+  public String format(@NotNull final String text) {
+    return ChatColor.translateAlternateColorCodes('&', text);
+  }
+
   @Nullable
   @Override
   public LineColor getByChar(final char charAt) {
