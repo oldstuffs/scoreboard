@@ -43,9 +43,6 @@ final class BoardTest {
       .addDynamicObserverList(() -> Set.of(new User("observer-1")))
       .build()
       .start();
-    while (true) {
-      Thread.sleep(5L);
-    }
   }
 
   private static final class Sender implements ScoreboardSender<User> {
