@@ -41,16 +41,16 @@ import org.jetbrains.annotations.NotNull;
 public interface Line<O> extends Function<@NotNull O, @NotNull String>, Closeable {
 
   /**
-   * creates a simple line instance.
+   * creates a simple dynamic line instance.
    *
    * @param line the line to create.
    * @param <O> type of the observers.
    *
-   * @return a newly created line instance.
+   * @return a newly created dynamic line instance.
    */
   @NotNull
-  static <O> Line<O> line(@NotNull final Function<@NotNull O, @NotNull String> line) {
-    return new Impl<>(line);
+  static <O> Line<O> dynamic(@NotNull final Function<@NotNull O, @NotNull String> line) {
+    return new Impl<>(line, false);
   }
 
   /**
@@ -62,7 +62,7 @@ public interface Line<O> extends Function<@NotNull O, @NotNull String>, Closeabl
    * @return a newly created line instance.
    */
   @NotNull
-  static <O> Line<O> simple(@NotNull final String line) {
+  static <O> Line<O> immutable(@NotNull final String line) {
     return new Impl<>(observer -> line, false);
   }
 
@@ -76,6 +76,22 @@ public interface Line<O> extends Function<@NotNull O, @NotNull String>, Closeabl
    * @return {@code true} if the line should update every sent.
    */
   boolean isUpdate();
+
+  /**
+   * an envelope implementation of {@link Line}.
+   *
+   * @param <O> type of the observer.
+   */
+  @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+  abstract class Envelope<O> implements Line<O> {
+
+    /**
+     * the delegate.
+     */
+    @NotNull
+    @Delegate
+    private final Line<O> delegate;
+  }
 
   /**
    * a simple implementation of {@link Line}.
@@ -97,14 +113,5 @@ public interface Line<O> extends Function<@NotNull O, @NotNull String>, Closeabl
      */
     @Getter
     private final boolean update;
-
-    /**
-     * ctor.
-     *
-     * @param function the function.
-     */
-    private Impl(@NotNull final Function<@NotNull O, @NotNull String> function) {
-      this(function, true);
-    }
   }
 }

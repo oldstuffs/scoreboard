@@ -347,7 +347,7 @@ public final class Board<O> implements Closeable {
      * the title line.
      */
     @NotNull
-    private Line<O> titleLine = Line.simple("");
+    private Line<O> titleLine = Line.immutable("");
 
     /**
      * the type.
@@ -530,7 +530,7 @@ public final class Board<O> implements Closeable {
      */
     @NotNull
     public Builder<O> addLine(final int lineNumber, @NotNull final Function<@NotNull O, @NotNull String> line) {
-      return this.addLine(lineNumber, Line.line(line));
+      return this.addLine(lineNumber, Line.dynamic(line));
     }
 
     /**

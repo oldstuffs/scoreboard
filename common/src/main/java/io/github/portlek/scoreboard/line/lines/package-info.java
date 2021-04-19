@@ -22,44 +22,7 @@
  * SOFTWARE.
  *
  */
-
-package io.github.portlek.scoreboard.line;
-
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Function;
-import org.hamcrest.core.IsEqual;
-import org.junit.jupiter.api.Test;
-import org.llorllale.cactoos.matchers.Assertion;
-
-final class LineTest {
-
-  @Test
-  void close() {
-    Line.dynamic(Function.identity())
-      .close();
-  }
-
-  @Test
-  void line() {
-    final var printed = new AtomicReference<String>();
-    final var line = Line.dynamic(observer -> "observer-1");
-    printed.set(line.apply("null"));
-    new Assertion<>(
-      "Couldn't build the line.",
-      printed.get(),
-      new IsEqual<>("observer-1")
-    ).affirm();
-  }
-
-  @Test
-  void simple() {
-    final var printed = new AtomicReference<String>();
-    final var line = Line.immutable("observer-1");
-    printed.set(line.apply("null"));
-    new Assertion<>(
-      "Couldn't build the line.",
-      printed.get(),
-      new IsEqual<>("observer-1")
-    ).affirm();
-  }
-}
+/**
+ * the package that contains implementation of {@link io.github.portlek.scoreboard.line.Line}.
+ */
+package io.github.portlek.scoreboard.line.lines;
