@@ -390,12 +390,10 @@ public final class BukkitPlayerScoreboard implements Closeable {
         } else if (prefix.charAt(14) == ChatColor.COLOR_CHAR) {
           prefix = prefix.substring(0, 14);
           suffix = this.line.substring(14);
+        } else if (ChatColor.getLastColors(prefix).equalsIgnoreCase(ChatColor.getLastColors(this.identifier))) {
+          suffix = this.line.substring(16);
         } else {
-          if (ChatColor.getLastColors(prefix).equalsIgnoreCase(ChatColor.getLastColors(this.identifier))) {
-            suffix = this.line.substring(16);
-          } else {
-            suffix = ChatColor.getLastColors(prefix) + this.line.substring(16);
-          }
+          suffix = ChatColor.getLastColors(prefix) + this.line.substring(16);
         }
         if (suffix.length() > 16) {
           suffix = suffix.substring(0, 16);
