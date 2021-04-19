@@ -106,14 +106,15 @@ public final class BukkitPlayerScoreboard implements Closeable {
     if (player == null) {
       return;
     }
-    close(player);
+    this.close(player);
   }
 
   /**
    * closes the scoreboard.
+   *
    * @param player the player to close.
    */
-  public void close(@NotNull Player player) {
+  public void close(@NotNull final Player player) {
     final var scoreboardManager = Bukkit.getScoreboardManager();
     if (scoreboardManager != null) {
       player.setScoreboard(scoreboardManager.getNewScoreboard());
