@@ -66,7 +66,7 @@ public final class BukkitScoreboardSender implements ScoreboardSender<Player> {
     observers.stream()
       .map(Entity::getUniqueId)
       .map(uniqueId -> this.scoreboards.computeIfAbsent(uniqueId, uuid ->
-        new BukkitPlayerScoreboard(board, uuid).setup()))
+        BukkitPlayerScoreboard.create(board, uuid)))
       .forEach(scoreboard -> scoreboard.update(lines));
   }
 

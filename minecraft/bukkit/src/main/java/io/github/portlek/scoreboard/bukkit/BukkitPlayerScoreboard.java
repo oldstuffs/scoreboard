@@ -53,7 +53,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * a class that represents player scoreboards.
  */
-@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class BukkitPlayerScoreboard implements Closeable {
 
   /**
@@ -98,6 +98,21 @@ public final class BukkitPlayerScoreboard implements Closeable {
     if (scoreboardManager != null) {
       player.setScoreboard(scoreboardManager.getNewScoreboard());
     }
+  }
+
+  /**
+   * creates and initiates a player scoreboard instance.
+   *
+   * @param board the board to create.
+   * @param uniqueId the unique id to create.
+   *
+   * @return a newly created and initialized player scoreboard instace.
+   */
+  @NotNull
+  static BukkitPlayerScoreboard create(@NotNull final Board<Player> board, @NotNull final UUID uniqueId) {
+    final var scoreboard = new BukkitPlayerScoreboard(board, uniqueId);
+    scoreboard.setup();
+    return scoreboard;
   }
 
   /**
