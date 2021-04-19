@@ -25,14 +25,17 @@
 
 package io.github.portlek.scoreboard.bukkit;
 
+import io.github.portlek.scoreboard.Board;
 import io.github.portlek.scoreboard.ScoreboardSender;
 import io.github.portlek.scoreboard.line.Line;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.Synchronized;
 import org.bukkit.entity.Entity;
@@ -43,35 +46,41 @@ import org.jetbrains.annotations.NotNull;
 /**
  * a {@link Player} implementation of {@link ScoreboardSender}.
  */
-@Getter
-@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
+@NoArgsConstructor(access = AccessLevel.PACKAGE)
 public final class BukkitScoreboardSender implements ScoreboardSender<Player> {
-
-  /**
-   * the plugin.
-   */
-  @NotNull
-  private final Plugin plugin;
 
   /**
    * the scoreboards.
    */
-  private final Map<UUID, PlayerScoreboard> scoreboards = new ConcurrentHashMap<>();
+  private final Map<UUID, BukkitPlayerScoreboard> scoreboards = new ConcurrentHashMap<>();
 
   @Override
   public void close() {
     this.scoreboards.values()
-      .forEach(PlayerScoreboard::close);
+      .forEach(BukkitPlayerScoreboard::close);
     this.scoreboards.clear();
   }
 
   @Override
   @Synchronized("scoreboards")
-  public void send(@NotNull final Collection<Player> observers, @NotNull final Map<Integer, Line<Player>> lines) {
+  public void send(@NotNull final Board<Player> board, @NotNull final Collection<Player> observers,
+                   @NotNull final List<Line<Player>> lines) {
     observers.stream()
       .map(Entity::getUniqueId)
-      .map(uniqueId -> this.scoreboards.computeIfAbsent(uniqueId, uuid -> new PlayerScoreboard(this, uuid)))
-      .forEach(scoreboard -> scoreboard.updateLines(lines));
+      .map(uniqueId -> this.scoreboards.computeIfAbsent(uniqueId, uuid ->
+        new BukkitPlayerScoreboard(board, uuid).setup()))
+      .forEach(scoreboard -> scoreboard.update(lines));
+  }
+
+  /**
+   * obtains the scoreboards.
+   *
+   * @return scoreboards.
+   */
+  @NotNull
+  @Synchronized("scoreboards")
+  public Collection<BukkitPlayerScoreboard> getScoreboards() {
+    return this.scoreboards.values();
   }
 
   /**

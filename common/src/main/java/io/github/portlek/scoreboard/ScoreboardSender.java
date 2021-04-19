@@ -28,7 +28,7 @@ package io.github.portlek.scoreboard;
 import io.github.portlek.scoreboard.line.Line;
 import java.io.Closeable;
 import java.util.Collection;
-import java.util.Map;
+import java.util.List;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -44,10 +44,11 @@ public interface ScoreboardSender<O> extends Closeable {
   /**
    * sends the scoreboard lines to the observers.
    *
+   * @param board the board to send.
    * @param observers the observers to send.
    * @param lines the lines to send.
    */
-  void send(@NotNull Collection<O> observers, @NotNull Map<Integer, Line<O>> lines);
+  void send(@NotNull Board<O> board, @NotNull Collection<O> observers, @NotNull List<Line<O>> lines);
 
   /**
    * a class that represents empty {@link ScoreboardSender} implementation.
@@ -61,7 +62,8 @@ public interface ScoreboardSender<O> extends Closeable {
     }
 
     @Override
-    public void send(@NotNull final Collection<O> observers, @NotNull final Map<Integer, Line<O>> lines) {
+    public void send(@NotNull final Board<O> board, @NotNull final Collection<O> observers,
+                     @NotNull final List<Line<O>> lines) {
     }
   }
 }

@@ -23,68 +23,37 @@
  *
  */
 
-package io.github.portlek.scoreboard.bukkit;
+package io.github.portlek.scoreboard;
 
-import io.github.portlek.scoreboard.line.Line;
-import java.io.Closeable;
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import lombok.Synchronized;
-import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
 
 /**
- * a class that represents player scoreboards.
+ * an enum class that contains board types.
  */
+@Getter
 @RequiredArgsConstructor
-public final class PlayerScoreboard implements Closeable {
+public enum BoardType {
+  /**
+   * the kohi.
+   */
+  KOHI(true, 15),
+  /**
+   * the viper.
+   */
+  VIPER(true, -1),
+  /**
+   * the modern.
+   */
+  MODERN(false, 1);
 
   /**
-   * the lines.
+   * the descending.
    */
-  @NotNull
-  private final Map<Integer, Line<Player>> lines = new ConcurrentHashMap<>();
+  private final boolean descending;
 
   /**
-   * the sender.
+   * the start number.
    */
-  @NotNull
-  private final BukkitScoreboardSender sender;
-
-  /**
-   * the unique id.
-   */
-  @NotNull
-  private final UUID uniqueId;
-
-  /**
-   * ctor.
-   *
-   * @param sender the sender.
-   * @param player the player.
-   */
-  public PlayerScoreboard(@NotNull final BukkitScoreboardSender sender,
-                          @NotNull final Player player) {
-    this(sender, player.getUniqueId());
-  }
-
-  @Override
-  public void close() {
-  }
-
-  /**
-   * updates {@link #lines}.
-   *
-   * @param lines the lines to update.
-   */
-  @Synchronized("lines")
-  void updateLines(@NotNull final Map<Integer, Line<Player>> lines) {
-    lines.forEach((lineNumber, line) -> {
-      if (line.isUpdate()) {
-        this.lines.put(lineNumber, line);
-      }
-    });
-  }
+  private final int startNumber;
 }

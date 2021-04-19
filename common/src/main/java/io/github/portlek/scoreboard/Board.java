@@ -27,10 +27,11 @@ package io.github.portlek.scoreboard;
 
 import io.github.portlek.scoreboard.line.Line;
 import java.io.Closeable;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -42,7 +43,6 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -96,7 +96,7 @@ public final class Board<O> implements Closeable {
    * the lines.
    */
   @NotNull
-  private final Map<Integer, Line<O>> lines;
+  private final List<Line<O>> lines;
 
   /**
    * the mutable board.
@@ -151,6 +151,18 @@ public final class Board<O> implements Closeable {
   private final long tick;
 
   /**
+   * the title line.
+   */
+  @NotNull
+  private final Line<O> titleLine;
+
+  /**
+   * the type.
+   */
+  @NotNull
+  private final BoardType type;
+
+  /**
    * obtains the board by id.
    *
    * @param id the id to obtain.
@@ -196,7 +208,7 @@ public final class Board<O> implements Closeable {
   public void close() {
     this.asyncScheduler.shutdown();
     this.scoreboardSender.close();
-    this.lines.values().forEach(Line::close);
+    this.lines.forEach(Line::close);
   }
 
   /**
@@ -276,7 +288,7 @@ public final class Board<O> implements Closeable {
      * the lines.
      */
     @NotNull
-    private Map<Integer, Line<O>> lines = new ConcurrentHashMap<>();
+    private List<Line<O>> lines = new ArrayList<>();
 
     /**
      * the remove if.
@@ -319,6 +331,18 @@ public final class Board<O> implements Closeable {
     private long tick = 1000L;
 
     /**
+     * the title line.
+     */
+    @NotNull
+    private Line<O> titleLine = Line.simple("");
+
+    /**
+     * the type.
+     */
+    @NotNull
+    private BoardType type = BoardType.MODERN;
+
+    /**
      * adds the given dynamic observers to the {@link #dynamicObservers}.
      *
      * @param observers the observers to add.
@@ -347,7 +371,7 @@ public final class Board<O> implements Closeable {
     }
 
     /**
-     * adds the given lines to the first empty line of {@link #lines}.
+     * adds the given lines to {@link #lines}.
      *
      * @param lines the lines to add.
      *
@@ -356,12 +380,7 @@ public final class Board<O> implements Closeable {
     @SafeVarargs
     @NotNull
     public final Builder<O> addLines(@NotNull final Line<O>... lines) {
-      final var keys = this.lines.keySet();
-      final var lineIterator = Arrays.stream(lines).iterator();
-      final var size = keys.isEmpty() ? 1 : keys.size();
-      IntStream.iterate(0, index -> lineIterator.hasNext() && index < size, index -> index + 1)
-        .filter(index -> !keys.contains(index))
-        .forEach(index -> this.lines.put(index, lineIterator.next()));
+      Collections.addAll(this.lines, lines);
       return this;
     }
 
@@ -431,7 +450,7 @@ public final class Board<O> implements Closeable {
      */
     @NotNull
     public Builder<O> addLine(final int lineNumber, @NotNull final Line<O> line) {
-      this.lines.put(lineNumber, line);
+      this.lines.set(lineNumber, line);
       return this;
     }
 
@@ -461,7 +480,7 @@ public final class Board<O> implements Closeable {
       }
       final var board = new Board<>(this.asyncScheduler, this.dynamicObservers, this.filters, this.id, this.lines,
         this.observerClass, this.removeIf, this.runAfter, this.runBefore, this.scoreboardSender, this.startDelay,
-        this.staticObservers, this.tick);
+        this.staticObservers, this.tick, this.titleLine, this.type);
       if (this.id != null) {
         Board.BOARDS.put(this.id, board);
       }
@@ -528,7 +547,7 @@ public final class Board<O> implements Closeable {
      * @return {@code this} for build chain.
      */
     @NotNull
-    public Builder<O> setLines(@NotNull final Map<Integer, Line<O>> lines) {
+    public Builder<O> setLines(@NotNull final List<Line<O>> lines) {
       this.lines = lines;
       return this;
     }
@@ -633,6 +652,32 @@ public final class Board<O> implements Closeable {
       this.tick = tick;
       return this;
     }
+
+    /**
+     * sets the title line.
+     *
+     * @param titleLine the title line to set.
+     *
+     * @return {@code this} for builder chain.
+     */
+    @NotNull
+    public Builder<O> setTitleLine(final Line<O> titleLine) {
+      this.titleLine = titleLine;
+      return this;
+    }
+
+    /**
+     * sets the type.
+     *
+     * @param type type to set.
+     *
+     * @return {@code this} for builder chain.
+     */
+    @NotNull
+    public Builder<O> setType(@NotNull final BoardType type) {
+      this.type = type;
+      return this;
+    }
   }
 
   /**
@@ -671,7 +716,7 @@ public final class Board<O> implements Closeable {
       this.staticObserversRemoveIf();
       final var observers = this.getObservers();
       this.board.getRunBefore().forEach(observers::forEach);
-      this.board.getScoreboardSender().send(observers, this.board.getLines());
+      this.board.getScoreboardSender().send(this.board, observers, this.board.getLines());
       this.board.getRunAfter().forEach(observers::forEach);
     }
 
