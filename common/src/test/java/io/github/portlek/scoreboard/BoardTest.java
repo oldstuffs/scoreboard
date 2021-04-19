@@ -23,55 +23,50 @@
  *
  */
 
-package io.github.portlek.scoreboard.bukkit;
+package io.github.portlek.scoreboard;
 
-import lombok.AccessLevel;
-import lombok.Getter;
+import io.github.portlek.scoreboard.line.Line;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
+import org.junit.jupiter.api.Test;
 
-/**
- * a class that represents Bukkit scoreboard thread..
- */
-@Getter
-@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
-public final class BukkitScoreboardThread extends Thread {
+final class BoardTest {
 
-  /**
-   * the sender.
-   */
-  @NotNull
-  private final BukkitScoreboardSender sender;
-
-  /**
-   * the tick.
-   */
-  private final long tick;
-
-  @Override
-  public void run() {
+  @Test
+  void test() throws InterruptedException {
+    Board.newBuilder(User.class)
+      .setScoreboardSender(new Sender())
+      .addDynamicObserverList(() -> Set.of(new User("observer-1")))
+      .build()
+      .start();
     while (true) {
-      try {
-        this.tick();
-        //noinspection BusyWait
-        Thread.sleep(this.tick * 50);
-      } catch (final InterruptedException ignored) {
-      }
+      Thread.sleep(5L);
     }
   }
 
-  /**
-   * runs every {@link #tick} times 50.
-   */
-  private void tick() {
-    this.sender.getScoreboards().forEach(scoreboard -> {
-      try {
-        scoreboard.tick();
-      } catch (final Exception e) {
-        e.printStackTrace();
-        throw new IllegalStateException(String.format("There was an error updating %s's scoreboard.",
-          scoreboard.getUniqueId()));
-      }
-    });
+  private static final class Sender implements ScoreboardSender<User> {
+
+    @Override
+    public void close() {
+      System.out.println("closed");
+    }
+
+    @Override
+    public void send(@NotNull final Board<User> board, @NotNull final Collection<User> observers,
+                     @NotNull final List<Line<User>> lines) {
+      System.out.println("send -> " + observers);
+    }
+  }
+
+  @ToString
+  @RequiredArgsConstructor
+  private static final class User {
+
+    @NotNull
+    private final String name;
   }
 }

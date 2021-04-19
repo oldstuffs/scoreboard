@@ -204,7 +204,6 @@ public final class BukkitPlayerScoreboard implements Closeable {
       final var line = ChatColor.translateAlternateColorCodes('&', newLines.get(index).apply(player));
       if (entry == null) {
         entry = new Entry(this.generateIdentifier(index), this, line);
-        entry.setup();
       } else {
         entry.setLine(line);
       }

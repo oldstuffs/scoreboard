@@ -23,55 +23,29 @@
  *
  */
 
-package io.github.portlek.scoreboard.bukkit;
+package io.github.portlek.scoreboard;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.NotNull;
+import org.junit.jupiter.api.Test;
 
-/**
- * a class that represents Bukkit scoreboard thread..
- */
-@Getter
-@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
-public final class BukkitScoreboardThread extends Thread {
+final class BoardTypeTest {
 
-  /**
-   * the sender.
-   */
-  @NotNull
-  private final BukkitScoreboardSender sender;
-
-  /**
-   * the tick.
-   */
-  private final long tick;
-
-  @Override
-  public void run() {
-    while (true) {
-      try {
-        this.tick();
-        //noinspection BusyWait
-        Thread.sleep(this.tick * 50);
-      } catch (final InterruptedException ignored) {
-      }
-    }
+  @Test
+  void getStartNumber() {
+    BoardType.MODERN.getStartNumber();
   }
 
-  /**
-   * runs every {@link #tick} times 50.
-   */
-  private void tick() {
-    this.sender.getScoreboards().forEach(scoreboard -> {
-      try {
-        scoreboard.tick();
-      } catch (final Exception e) {
-        e.printStackTrace();
-        throw new IllegalStateException(String.format("There was an error updating %s's scoreboard.",
-          scoreboard.getUniqueId()));
-      }
-    });
+  @Test
+  void isDescending() {
+    BoardType.MODERN.isDescending();
+  }
+
+  @Test
+  void valueOf() {
+    BoardType.valueOf("MODERN");
+  }
+
+  @Test
+  void values() {
+    BoardType.values();
   }
 }

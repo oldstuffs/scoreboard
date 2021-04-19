@@ -794,6 +794,9 @@ public final class Board<O> implements Closeable {
     public void send() {
       this.staticObserversRemoveIf();
       final var observers = this.getObservers();
+      if (observers.isEmpty()) {
+        return;
+      }
       this.board.getRunBefore().forEach(observers::forEach);
       this.board.getScoreboardSender().send(this.board, observers, this.board.getLines());
       this.board.getRunAfter().forEach(observers::forEach);
@@ -810,20 +813,20 @@ public final class Board<O> implements Closeable {
       final var observers = this.staticObservers.stream()
         .filter(observer ->
           this.board.getFilters().stream()
-            .anyMatch(predicate -> predicate.test(observer)))
+            .allMatch(predicate -> predicate.test(observer)))
         .collect(Collectors.toSet());
       this.board.getDynamicObservers().stream()
         .map(Supplier::get)
         .filter(observer ->
           this.board.getFilters().stream()
-            .anyMatch(predicate -> predicate.test(observer)))
+            .allMatch(predicate -> predicate.test(observer)))
         .forEach(observers::add);
       this.board.getDynamicObserverList().stream()
         .map(Supplier::get)
         .flatMap(Collection::stream)
         .filter(observer ->
           this.board.getFilters().stream()
-            .anyMatch(predicate -> predicate.test(observer)))
+            .allMatch(predicate -> predicate.test(observer)))
         .forEach(observers::add);
       return observers;
     }
