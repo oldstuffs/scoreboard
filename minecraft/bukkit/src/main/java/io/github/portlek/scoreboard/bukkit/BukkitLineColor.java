@@ -35,7 +35,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * a class that represents Bukkit's line colors.
  */
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE, staticName = "of")
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class BukkitLineColor implements LineColor {
 
   /**
@@ -43,6 +43,18 @@ public final class BukkitLineColor implements LineColor {
    */
   @NotNull
   private final ChatColor color;
+
+  /**
+   * creates a new line color instance.
+   *
+   * @param color the color to create.
+   *
+   * @return a newly created line color instance.
+   */
+  @NotNull
+  public static LineColor create(@NotNull final ChatColor color) {
+    return new BukkitLineColor(color);
+  }
 
   @Nullable
   @Override
