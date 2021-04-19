@@ -23,74 +23,47 @@
  *
  */
 
-package io.github.portlek.scoreboard;
+package io.github.portlek.scoreboard.line;
 
+import java.util.function.Function;
 import lombok.AccessLevel;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.Delegate;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * a class that represents line of scoreboards.
+ * an interface to determine a line of scoreboards.
  *
- * @param <O> type of the observers.
+ * @param <O> type of the observer.
  */
-@Getter
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class Line<O> {
+@FunctionalInterface
+public interface Line<O> extends Function<@NotNull O, @NotNull String> {
 
   /**
-   * the line number.
-   */
-  private final int lineNumber;
-
-  /**
-   * creates a new {@link Builder} instance.
+   * creates a simple line instance.
    *
-   * @param <O> type of the observers.
+   * @param line the line to create.
    *
-   * @return a newly created {@link Builder} instance.
+   * @return a newly created line instance.
    */
   @NotNull
-  public static <O> Builder<O> builder() {
-    return new Builder<>();
+  static <O> Line<O> line(@NotNull final Function<@NotNull O, @NotNull String> line) {
+    return new Impl<>(line);
   }
 
   /**
-   * a class that represents builders for {@link Line}.
+   * a simple implementation of {@link Line}.
    *
-   * @param <O> type of the observers.
+   * @param <O> type of the observer.
    */
-  @Getter
   @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-  public static final class Builder<O> {
+  final class Impl<O> implements Line<O> {
 
     /**
-     * the line number.
-     */
-    private int lineNumber = 0;
-
-    /**
-     * builds the {@link Line} instance.
-     *
-     * @return line instance.
+     * the function.
      */
     @NotNull
-    public Line<O> build() {
-      return new Line<>(this.lineNumber);
-    }
-
-    /**
-     * sets the line number.
-     *
-     * @param lineNumber the line number to set.
-     *
-     * @return {@code this} for builder chain.
-     */
-    @NotNull
-    public Builder<O> setLineNumber(final int lineNumber) {
-      this.lineNumber = lineNumber;
-      return this;
-    }
+    @Delegate
+    private final Function<@NotNull O, @NotNull String> function;
   }
 }

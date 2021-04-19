@@ -22,46 +22,7 @@
  * SOFTWARE.
  *
  */
-
-package io.github.portlek.scoreboard;
-
-import io.github.portlek.scoreboard.line.Line;
-import java.io.Closeable;
-import java.util.Map;
-import java.util.Set;
-import org.jetbrains.annotations.NotNull;
-
 /**
- * an interface to determine scoreboard senders.
- *
- * @param <O> type of the observers.
+ * the package that contains line classes.
  */
-public interface ScoreboardSender<O> extends Closeable {
-
-  @Override
-  void close();
-
-  /**
-   * sends the scoreboard lines to the observers.
-   *
-   * @param observers the observers to send.
-   * @param lines the lines to send.
-   */
-  void send(@NotNull Set<O> observers, @NotNull Map<Integer, Line<O>> lines);
-
-  /**
-   * a class that represents empty {@link ScoreboardSender} implementation.
-   *
-   * @param <O> type of the observers.
-   */
-  class Empty<O> implements ScoreboardSender<O> {
-
-    @Override
-    public void close() {
-    }
-
-    @Override
-    public void send(@NotNull final Set<O> observers, @NotNull final Map<Integer, Line<O>> lines) {
-    }
-  }
-}
+package io.github.portlek.scoreboard.line;

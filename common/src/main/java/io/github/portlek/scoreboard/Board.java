@@ -25,7 +25,9 @@
 
 package io.github.portlek.scoreboard;
 
+import io.github.portlek.scoreboard.line.Line;
 import java.io.Closeable;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
@@ -36,9 +38,11 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -92,7 +96,7 @@ public final class Board<O> implements Closeable {
    * the lines.
    */
   @NotNull
-  private final Set<Line<O>> lines;
+  private final Map<Integer, Line<O>> lines;
 
   /**
    * the mutable board.
@@ -271,7 +275,7 @@ public final class Board<O> implements Closeable {
      * the lines.
      */
     @NotNull
-    private Set<Line<O>> lines = new HashSet<>();
+    private Map<Integer, Line<O>> lines = new ConcurrentHashMap<>();
 
     /**
      * the remove if.
@@ -342,7 +346,7 @@ public final class Board<O> implements Closeable {
     }
 
     /**
-     * adds the given lines to the {@link #lines}.
+     * adds the given lines to the first empty line of {@link #lines}.
      *
      * @param lines the lines to add.
      *
@@ -351,7 +355,11 @@ public final class Board<O> implements Closeable {
     @SafeVarargs
     @NotNull
     public final Builder<O> addLines(@NotNull final Line<O>... lines) {
-      Collections.addAll(this.lines, lines);
+      final var keys = this.lines.keySet();
+      final var lineIterator = Arrays.stream(lines).iterator();
+      IntStream.iterate(0, index -> lineIterator.hasNext() && index < keys.size(), index -> index + 1)
+        .filter(index -> !keys.contains(index))
+        .forEach(index -> this.lines.put(index, lineIterator.next()));
       return this;
     }
 
@@ -409,6 +417,33 @@ public final class Board<O> implements Closeable {
     public final Builder<O> addStaticObservers(@NotNull final O... observers) {
       Collections.addAll(this.staticObservers, observers);
       return this;
+    }
+
+    /**
+     * adds the given line to the {@link #lines}.
+     *
+     * @param lineNumber the line number to add.
+     * @param line the line to add.
+     *
+     * @return {@code this} for builder chain.
+     */
+    @NotNull
+    public Builder<O> addLine(final int lineNumber, @NotNull final Line<O> line) {
+      this.lines.put(lineNumber, line);
+      return this;
+    }
+
+    /**
+     * adds the given line to the {@link #lines}.
+     *
+     * @param lineNumber the line number to add.
+     * @param line the line to add.
+     *
+     * @return {@code this} for builder chain.
+     */
+    @NotNull
+    public Builder<O> addLine(final int lineNumber, @NotNull final Function<@NotNull O, @NotNull String> line) {
+      return this.addLine(lineNumber, Line.line(line));
     }
 
     /**
@@ -491,7 +526,7 @@ public final class Board<O> implements Closeable {
      * @return {@code this} for build chain.
      */
     @NotNull
-    public Builder<O> setLines(@NotNull final Set<Line<O>> lines) {
+    public Builder<O> setLines(@NotNull final Map<Integer, Line<O>> lines) {
       this.lines = lines;
       return this;
     }
