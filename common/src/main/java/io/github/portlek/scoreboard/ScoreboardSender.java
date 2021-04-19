@@ -54,7 +54,7 @@ public interface ScoreboardSender<O> extends Closeable {
    *
    * @param <O> type of the observers.
    */
-  class Empty<O> implements ScoreboardSender<O> {
+  final class Empty<O> implements ScoreboardSender<O> {
 
     @Override
     public void close() {
