@@ -151,19 +151,6 @@ public final class Board<O> implements Closeable {
   private final long tick;
 
   /**
-   * creates a new instance of {@link Builder}.
-   *
-   * @param observerClass the observer class to create.
-   * @param <O> type of the observers.
-   *
-   * @return a newly created instance of {@link Builder}.
-   */
-  @NotNull
-  public static <O> Builder<O> builder(@NotNull final Class<O> observerClass) {
-    return new Builder<>(observerClass);
-  }
-
-  /**
    * obtains the board by id.
    *
    * @param id the id to obtain.
@@ -190,6 +177,19 @@ public final class Board<O> implements Closeable {
     return Board.getBoardById(id)
       .filter(board -> observerClass.isAssignableFrom(board.getObserverClass()))
       .map(board -> (Board<O>) board);
+  }
+
+  /**
+   * creates a new instance of {@link Builder}.
+   *
+   * @param observerClass the observer class to create.
+   * @param <O> type of the observers.
+   *
+   * @return a newly created instance of {@link Builder}.
+   */
+  @NotNull
+  public static <O> Builder<O> newBuilder(@NotNull final Class<O> observerClass) {
+    return new Builder<>(observerClass);
   }
 
   @Override
@@ -357,7 +357,8 @@ public final class Board<O> implements Closeable {
     public final Builder<O> addLines(@NotNull final Line<O>... lines) {
       final var keys = this.lines.keySet();
       final var lineIterator = Arrays.stream(lines).iterator();
-      IntStream.iterate(0, index -> lineIterator.hasNext() && index < keys.size(), index -> index + 1)
+      final var size = keys.isEmpty() ? 1 : keys.size();
+      IntStream.iterate(0, index -> lineIterator.hasNext() && index < size, index -> index + 1)
         .filter(index -> !keys.contains(index))
         .forEach(index -> this.lines.put(index, lineIterator.next()));
       return this;
