@@ -66,7 +66,7 @@ public final class BukkitScoreboard implements Listener, AutoCloseable {
    */
   @NotNull
   public static BukkitScoreboard create(@NotNull final Plugin plugin, final long tick) {
-    return new BukkitScoreboard(plugin, new BukkitScoreboardThread(new BukkitScoreboardSender(), tick));
+    return new BukkitScoreboard(plugin, new BukkitScoreboardThread(new BukkitScoreboardSender(plugin), tick));
   }
 
   @Override

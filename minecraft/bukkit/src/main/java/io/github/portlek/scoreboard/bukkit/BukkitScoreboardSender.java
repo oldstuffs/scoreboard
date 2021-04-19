@@ -35,17 +35,24 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.Synchronized;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * a {@link Player} implementation of {@link ScoreboardSender}.
  */
-@NoArgsConstructor(access = AccessLevel.PACKAGE)
+@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public final class BukkitScoreboardSender implements ScoreboardSender<Player> {
+
+  /**
+   * the plugin.
+   */
+  @NotNull
+  private final Plugin plugin;
 
   /**
    * the scoreboards.
@@ -66,7 +73,7 @@ public final class BukkitScoreboardSender implements ScoreboardSender<Player> {
     observers.stream()
       .map(Entity::getUniqueId)
       .map(uniqueId -> this.scoreboards.computeIfAbsent(uniqueId, uuid ->
-        BukkitPlayerScoreboard.create(board, uuid)))
+        BukkitPlayerScoreboard.create(board, lines, this.plugin, uuid)))
       .forEach(scoreboard -> scoreboard.update(lines));
   }
 

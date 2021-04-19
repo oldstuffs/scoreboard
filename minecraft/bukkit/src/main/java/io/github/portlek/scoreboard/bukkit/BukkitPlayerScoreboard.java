@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.IntStream;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -43,6 +44,7 @@ import lombok.Synchronized;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.scoreboard.DisplaySlot;
 import org.bukkit.scoreboard.Objective;
 import org.bukkit.scoreboard.Scoreboard;
@@ -79,7 +81,18 @@ public final class BukkitPlayerScoreboard implements Closeable {
    * the lines.
    */
   @NotNull
-  private final List<Line<Player>> lines = new ArrayList<>();
+  private final List<Line<Player>> lines;
+
+  /**
+   * the plugin.
+   */
+  @NotNull
+  private final Plugin plugin;
+
+  /**
+   * the setup.
+   */
+  private final AtomicBoolean setup = new AtomicBoolean();
 
   /**
    * the unique id.
@@ -104,13 +117,16 @@ public final class BukkitPlayerScoreboard implements Closeable {
    * creates and initiates a player scoreboard instance.
    *
    * @param board the board to create.
+   * @param lines the lines to create.
+   * @param plugin the plugin to create.
    * @param uniqueId the unique id to create.
    *
-   * @return a newly created and initialized player scoreboard instace.
+   * @return a newly created and initialized player scoreboard instance.
    */
   @NotNull
-  static BukkitPlayerScoreboard create(@NotNull final Board<Player> board, @NotNull final UUID uniqueId) {
-    final var scoreboard = new BukkitPlayerScoreboard(board, uniqueId);
+  static BukkitPlayerScoreboard create(@NotNull final Board<Player> board, @NotNull final List<Line<Player>> lines,
+                                       @NotNull final Plugin plugin, @NotNull final UUID uniqueId) {
+    final var scoreboard = new BukkitPlayerScoreboard(board, lines, plugin, uniqueId);
     scoreboard.setup();
     return scoreboard;
   }
@@ -137,25 +153,13 @@ public final class BukkitPlayerScoreboard implements Closeable {
   }
 
   /**
-   * setups the player.
-   *
-   * @return {@code this} for builder chain.
-   */
-  @NotNull
-  BukkitPlayerScoreboard setup() {
-    final var player = Bukkit.getPlayer(this.uniqueId);
-    if (player != null) {
-      this.getScoreboard().ifPresent(player::setScoreboard);
-      this.getObjective();
-    }
-    return this;
-  }
-
-  /**
    * ticks.
    */
   @Synchronized("lines")
   void tick() {
+    if (!this.setup.get()) {
+      return;
+    }
     final var player = Bukkit.getPlayer(this.uniqueId);
     if (player == null) {
       return;
@@ -186,7 +190,7 @@ public final class BukkitPlayerScoreboard implements Closeable {
     if (this.lines.size() > 15) {
       newLines = this.lines.subList(0, 15);
     } else {
-      newLines = this.lines;
+      newLines = new ArrayList<>(this.lines);
     }
     final var boardType = this.board.getType();
     if (!boardType.isDescending()) {
@@ -307,6 +311,24 @@ public final class BukkitPlayerScoreboard implements Closeable {
       return Optional.of(player.getScoreboard());
     }
     return Optional.of(scoreboardManager.getNewScoreboard());
+  }
+
+  /**
+   * setups the player.
+   *
+   * @return {@code this} for builder chain.
+   */
+  @NotNull
+  private BukkitPlayerScoreboard setup() {
+    Bukkit.getScheduler().runTask(this.plugin, () -> {
+      final var player = Bukkit.getPlayer(this.uniqueId);
+      if (player != null) {
+        this.getScoreboard().ifPresent(player::setScoreboard);
+        this.getObjective();
+      }
+      this.setup.set(true);
+    });
+    return this;
   }
 
   /**
