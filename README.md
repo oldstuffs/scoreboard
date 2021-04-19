@@ -1,7 +1,7 @@
 [![idea](https://www.elegantobjects.org/intellij-idea.svg)](https://www.jetbrains.com/idea/)
 
 ![master](https://github.com/portlek/scoreboard/workflows/build/badge.svg)
-[![Maven Central](https://img.shields.io/maven-central/v/io.github.portlek/scoreboard?label=version)](https://repo1.maven.org/maven2/io/github/portlek/scoreboard/)
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.portlek/scoreboard-common?label=version)](https://repo1.maven.org/maven2/io/github/portlek/scoreboard-common/)
 
 ## How to use
 
