@@ -47,13 +47,11 @@ public final class BukkitLineColor implements LineColor {
   /**
    * creates a new line color instance.
    *
-   * @param color the color to create.
-   *
    * @return a newly created line color instance.
    */
   @NotNull
-  public static LineColor create(@NotNull final ChatColor color) {
-    return new BukkitLineColor(color);
+  public static LineColor create() {
+    return new BukkitLineColor(ChatColor.RESET);
   }
 
   @Nullable
