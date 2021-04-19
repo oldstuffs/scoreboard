@@ -8,11 +8,11 @@
 ```xml
 <dependency>
   <groupId>io.github.portlek</groupId>
-  <artifactId>scoreboard-common</artifactId>
+  <artifactId>scoreboard-bukkit</artifactId>
   <version>${version}</version>
 </dependency>
 ```
 
 ```groovy
-implementation("io.github.portlek:scoreboard-common:${version}")
+implementation("io.github.portlek:scoreboard-bukkit:${version}")
 ```
