@@ -9,11 +9,11 @@
 
 <dependency>
   <groupId>io.github.portlek</groupId>
-  <artifactId>scoreboard-bukkit</artifactId>
+  <artifactId>scoreboard-common</artifactId>
   <version>${version}</version>
 </dependency>
 ```
 
 ```groovy
-implementation("io.github.portlek:scoreboard-bukkit:${version}")
+implementation("io.github.portlek:scoreboard-common:${version}")
 ```
