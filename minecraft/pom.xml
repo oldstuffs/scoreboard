@@ -35,4 +35,10 @@
   <artifactId>scoreboard-minecraft</artifactId>
   <name>minecraft</name>
   <packaging>pom</packaging>
+  <dependencies>
+    <dependency>
+      <groupId>io.github.portlek</groupId>
+      <artifactId>scoreboard-common</artifactId>
+    </dependency>
+  </dependencies>
 </project>

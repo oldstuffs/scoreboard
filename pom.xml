@@ -26,4 +26,13 @@
     <module>common</module>
     <module>minecraft</module>
   </modules>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>io.github.portlek</groupId>
+        <artifactId>scoreboard-common</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 </project>
