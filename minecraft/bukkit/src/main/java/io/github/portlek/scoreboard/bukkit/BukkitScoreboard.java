@@ -92,7 +92,7 @@ public final class BukkitScoreboard implements Listener, AutoCloseable {
    */
   @EventHandler
   public void handle(final PlayerQuitEvent event) {
-    this.getSender().onQuit(event.getPlayer().getUniqueId());
+    this.getSender().onQuit(event.getPlayer());
   }
 
   /**

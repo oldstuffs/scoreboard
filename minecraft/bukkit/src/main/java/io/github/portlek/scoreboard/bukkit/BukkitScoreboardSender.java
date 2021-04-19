@@ -31,6 +31,7 @@ import io.github.portlek.scoreboard.line.Line;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.AccessLevel;
@@ -83,10 +84,11 @@ public final class BukkitScoreboardSender implements ScoreboardSender<Player> {
   /**
    * runs when the player quits from the game.
    *
-   * @param uniqueId the unique id to quit.
+   * @param player the player to quit.
    */
   @Synchronized("scoreboards")
-  void onQuit(@NotNull final UUID uniqueId) {
-    this.scoreboards.remove(uniqueId);
+  void onQuit(@NotNull final Player player) {
+    Optional.ofNullable(this.scoreboards.remove(player.getUniqueId()))
+      .ifPresent(scoreboard -> scoreboard.close(player));
   }
 }
