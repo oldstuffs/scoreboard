@@ -23,63 +23,59 @@
  *
  */
 
-package io.github.portlek.scoreboard.line;
+package io.github.portlek.scoreboard;
 
+import io.github.portlek.scoreboard.line.Line;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
-import org.hamcrest.core.IsEqual;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 import org.llorllale.cactoos.matchers.Assertion;
 import org.llorllale.cactoos.matchers.IsTrue;
 
-final class LineTest {
+final class ScoreboardSenderTest {
 
   @Test
   void close() {
     final var closed = new AtomicBoolean();
-    final var closableLine = new Line<>() {
-
-      @NotNull
-      @Override
-      public String apply(@NotNull final Object o) {
-        return "null";
-      }
-
+    final var sender = new ScoreboardSender<>() {
       @Override
       public void close() {
         closed.set(true);
       }
+
+      @Override
+      public void send(@NotNull final Set<Object> observers, @NotNull final Map<Integer, Line<Object>> lines) {
+      }
     };
-    closableLine.close();
+    sender.close();
     new Assertion<>(
-      "Line couldn't close.",
+      "Couldn't close the scoreboard sender.",
       closed.get(),
       new IsTrue()
     ).affirm();
   }
 
   @Test
-  void line() {
-    final var printed = new AtomicReference<String>();
-    final var line = Line.line(observer -> "observer-1");
-    printed.set(line.apply("null"));
-    new Assertion<>(
-      "Couldn't build the line.",
-      printed.get(),
-      new IsEqual<>("observer-1")
-    ).affirm();
-  }
+  void send() {
+    final var sent = new AtomicBoolean();
+    final var sender = new ScoreboardSender<>() {
+      @Override
+      public void close() {
+      }
 
-  @Test
-  void simple() {
-    final var printed = new AtomicReference<String>();
-    final var line = Line.simple("observer-1");
-    printed.set(line.apply("null"));
+      @Override
+      public void send(@NotNull final Set<Object> observers, @NotNull final Map<Integer, Line<Object>> lines) {
+        sent.set(true);
+      }
+    };
+    sender.send(Collections.emptySet(), Collections.emptyMap());
     new Assertion<>(
-      "Couldn't build the line.",
-      printed.get(),
-      new IsEqual<>("observer-1")
+      "Couldn't send the scoreboard.",
+      sent.get(),
+      new IsTrue()
     ).affirm();
   }
 }
