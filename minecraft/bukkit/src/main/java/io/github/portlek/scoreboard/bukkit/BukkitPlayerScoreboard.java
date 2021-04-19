@@ -248,7 +248,7 @@ public final class BukkitPlayerScoreboard implements Closeable {
     while (this.identifiers.contains(identifier)) {
       identifier = identifier + BukkitPlayerScoreboard.getRandomChatColor(position) + ChatColor.WHITE;
     }
-    if (identifier.length() > 144) {
+    if (identifier.length() > 64) {
       return this.generateIdentifier(position);
     }
     this.identifiers.add(identifier);
@@ -381,22 +381,22 @@ public final class BukkitPlayerScoreboard implements Closeable {
       if (this.team == null) {
         return;
       }
-      if (this.line.length() > 144) {
-        var prefix = this.line.substring(0, 143);
+      if (this.line.length() > 64) {
+        var prefix = this.line.substring(0, 63);
         String suffix;
-        if (prefix.charAt(142) == ChatColor.COLOR_CHAR) {
-          prefix = prefix.substring(0, 142);
-          suffix = this.line.substring(142);
-        } else if (prefix.charAt(141) == ChatColor.COLOR_CHAR) {
-          prefix = prefix.substring(0, 141);
-          suffix = this.line.substring(141);
+        if (prefix.charAt(62) == ChatColor.COLOR_CHAR) {
+          prefix = prefix.substring(0, 61);
+          suffix = this.line.substring(61);
+        } else if (prefix.charAt(61) == ChatColor.COLOR_CHAR) {
+          prefix = prefix.substring(0, 61);
+          suffix = this.line.substring(61);
         } else if (ChatColor.getLastColors(prefix).equalsIgnoreCase(ChatColor.getLastColors(this.identifier))) {
-          suffix = this.line.substring(143);
+          suffix = this.line.substring(63);
         } else {
-          suffix = ChatColor.getLastColors(prefix) + this.line.substring(143);
+          suffix = ChatColor.getLastColors(prefix) + this.line.substring(63);
         }
-        if (suffix.length() > 144) {
-          suffix = suffix.substring(0, 143);
+        if (suffix.length() > 62) {
+          suffix = suffix.substring(0, 63);
         }
         this.team.setPrefix(prefix);
         this.team.setSuffix(suffix);
@@ -414,8 +414,8 @@ public final class BukkitPlayerScoreboard implements Closeable {
      */
     private void setup() {
       this.scoreboard.getScoreboard().ifPresent(score -> {
-        final var teamName = this.identifier.length() > 144
-          ? this.identifier.substring(0, 143)
+        final var teamName = this.identifier.length() > 64
+          ? this.identifier.substring(0, 63)
           : this.identifier;
         var team = score.getTeam(teamName);
         if (team == null) {
