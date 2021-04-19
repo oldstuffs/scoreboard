@@ -25,57 +25,20 @@
 
 package io.github.portlek.scoreboard;
 
-import io.github.portlek.scoreboard.line.Line;
 import java.util.Collections;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
-import org.llorllale.cactoos.matchers.Assertion;
-import org.llorllale.cactoos.matchers.IsTrue;
 
 final class ScoreboardSenderTest {
 
   @Test
   void close() {
-    final var closed = new AtomicBoolean();
-    final var sender = new ScoreboardSender<>() {
-      @Override
-      public void close() {
-        closed.set(true);
-      }
-
-      @Override
-      public void send(@NotNull final Set<Object> observers, @NotNull final Map<Integer, Line<Object>> lines) {
-      }
-    };
-    sender.close();
-    new Assertion<>(
-      "Couldn't close the scoreboard sender.",
-      closed.get(),
-      new IsTrue()
-    ).affirm();
+    new ScoreboardSender.Empty<>()
+      .close();
   }
 
   @Test
   void send() {
-    final var sent = new AtomicBoolean();
-    final var sender = new ScoreboardSender<>() {
-      @Override
-      public void close() {
-      }
-
-      @Override
-      public void send(@NotNull final Set<Object> observers, @NotNull final Map<Integer, Line<Object>> lines) {
-        sent.set(true);
-      }
-    };
-    sender.send(Collections.emptySet(), Collections.emptyMap());
-    new Assertion<>(
-      "Couldn't send the scoreboard.",
-      sent.get(),
-      new IsTrue()
-    ).affirm();
+    new ScoreboardSender.Empty<>()
+      .send(Collections.emptySet(), Collections.emptyMap());
   }
 }

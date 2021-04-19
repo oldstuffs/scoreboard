@@ -25,38 +25,18 @@
 
 package io.github.portlek.scoreboard.line;
 
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
 import org.hamcrest.core.IsEqual;
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 import org.llorllale.cactoos.matchers.Assertion;
-import org.llorllale.cactoos.matchers.IsTrue;
 
 final class LineTest {
 
   @Test
   void close() {
-    final var closed = new AtomicBoolean();
-    final var closableLine = new Line<>() {
-
-      @NotNull
-      @Override
-      public String apply(@NotNull final Object o) {
-        return "null";
-      }
-
-      @Override
-      public void close() {
-        closed.set(true);
-      }
-    };
-    closableLine.close();
-    new Assertion<>(
-      "Line couldn't close.",
-      closed.get(),
-      new IsTrue()
-    ).affirm();
+    Line.line(Function.identity())
+      .close();
   }
 
   @Test
