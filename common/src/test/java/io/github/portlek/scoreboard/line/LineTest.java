@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2020 Hasan Demirtaş
+ * Copyright (c) 2021 Hasan Demirtaş
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,16 +25,41 @@
 
 package io.github.portlek.scoreboard.line;
 
-import io.github.portlek.scoreboard.Line;
-import io.github.portlek.scoreboard.Observer;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
-import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.NotNull;
+import org.hamcrest.core.IsEqual;
+import org.junit.jupiter.api.Test;
+import org.llorllale.cactoos.matchers.Assertion;
 
-@RequiredArgsConstructor
-public final class ObserverLine<O> implements Line {
+final class LineTest {
 
-    @NotNull
-    private final Function<Observer<O>, String> dynamicText;
+  @Test
+  void close() {
+    Line.line(Function.identity())
+      .close();
+  }
 
+  @Test
+  void line() {
+    final var printed = new AtomicReference<String>();
+    final var line = Line.line(observer -> "observer-1");
+    printed.set(line.apply("null"));
+    new Assertion<>(
+      "Couldn't build the line.",
+      printed.get(),
+      new IsEqual<>("observer-1")
+    ).affirm();
+  }
+
+  @Test
+  void simple() {
+    final var printed = new AtomicReference<String>();
+    final var line = Line.simple("observer-1");
+    printed.set(line.apply("null"));
+    new Assertion<>(
+      "Couldn't build the line.",
+      printed.get(),
+      new IsEqual<>("observer-1")
+    ).affirm();
+  }
 }

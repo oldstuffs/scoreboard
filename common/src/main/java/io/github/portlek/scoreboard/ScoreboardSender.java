@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2020 Hasan Demirtaş
+ * Copyright (c) 2021 Hasan Demirtaş
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,20 +25,43 @@
 
 package io.github.portlek.scoreboard;
 
-import lombok.RequiredArgsConstructor;
-import org.bukkit.entity.Player;
+import io.github.portlek.scoreboard.line.Line;
+import java.io.Closeable;
+import java.util.Map;
+import java.util.Set;
 import org.jetbrains.annotations.NotNull;
 
-@RequiredArgsConstructor
-public final class BukkitObserver implements Observer<Player> {
+/**
+ * an interface to determine scoreboard senders.
+ *
+ * @param <O> type of the observers.
+ */
+public interface ScoreboardSender<O> extends Closeable {
 
-    @NotNull
-    private final Player player;
+  @Override
+  void close();
 
-    @NotNull
+  /**
+   * sends the scoreboard lines to the observers.
+   *
+   * @param observers the observers to send.
+   * @param lines the lines to send.
+   */
+  void send(@NotNull Set<O> observers, @NotNull Map<Integer, Line<O>> lines);
+
+  /**
+   * a class that represents empty {@link ScoreboardSender} implementation.
+   *
+   * @param <O> type of the observers.
+   */
+  final class Empty<O> implements ScoreboardSender<O> {
+
     @Override
-    public Player get() {
-        return this.player;
+    public void close() {
     }
 
+    @Override
+    public void send(@NotNull final Set<O> observers, @NotNull final Map<Integer, Line<O>> lines) {
+    }
+  }
 }

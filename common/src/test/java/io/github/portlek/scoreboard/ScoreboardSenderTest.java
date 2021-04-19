@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2020 Hasan Demirtaş
+ * Copyright (c) 2021 Hasan Demirtaş
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,6 +25,20 @@
 
 package io.github.portlek.scoreboard;
 
-public interface Task {
+import java.util.Collections;
+import org.junit.jupiter.api.Test;
 
+final class ScoreboardSenderTest {
+
+  @Test
+  void close() {
+    new ScoreboardSender.Empty<>()
+      .close();
+  }
+
+  @Test
+  void send() {
+    new ScoreboardSender.Empty<>()
+      .send(Collections.emptySet(), Collections.emptyMap());
+  }
 }

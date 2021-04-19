@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2020 Hasan Demirtaş
+ * Copyright (c) 2021 Hasan Demirtaş
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,16 +22,7 @@
  * SOFTWARE.
  *
  */
-
+/**
+ * the package that contains main classes.
+ */
 package io.github.portlek.scoreboard;
-
-import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.NotNull;
-
-@RequiredArgsConstructor
-public final class BukkitTask implements Task {
-
-    @NotNull
-    private final org.bukkit.scheduler.BukkitTask bukkitTask;
-
-}

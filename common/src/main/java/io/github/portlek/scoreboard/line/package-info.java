@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2020 Hasan Demirtaş
+ * Copyright (c) 2021 Hasan Demirtaş
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,17 +22,7 @@
  * SOFTWARE.
  *
  */
-
+/**
+ * the package that contains line classes.
+ */
 package io.github.portlek.scoreboard.line;
-
-import io.github.portlek.scoreboard.Line;
-import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.NotNull;
-
-@RequiredArgsConstructor
-public final class StaticLine implements Line {
-
-    @NotNull
-    private final String text;
-
-}
