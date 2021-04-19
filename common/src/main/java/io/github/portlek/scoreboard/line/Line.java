@@ -43,6 +43,7 @@ public interface Line<O> extends Function<@NotNull O, @NotNull String> {
    * creates a simple line instance.
    *
    * @param line the line to create.
+   * @param <O> type of the observers.
    *
    * @return a newly created line instance.
    */
