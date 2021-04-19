@@ -32,6 +32,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.server.PluginDisableEvent;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
@@ -93,6 +94,16 @@ public final class BukkitScoreboard implements Listener, AutoCloseable {
   @EventHandler
   public void handle(final PlayerQuitEvent event) {
     this.getSender().onQuit(event.getPlayer());
+  }
+
+  /**
+   * runs when the plugin disables.
+   *
+   * @param event the event to handle.
+   */
+  @EventHandler
+  public void handle(final PluginDisableEvent event) {
+    this.close();
   }
 
   /**
