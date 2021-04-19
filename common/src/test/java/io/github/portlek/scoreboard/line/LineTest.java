@@ -62,9 +62,7 @@ final class LineTest {
   @Test
   void line() {
     final var printed = new AtomicReference<String>();
-    final var line = Line.line(observer -> {
-      return "observer-1";
-    });
+    final var line = Line.line(observer -> "observer-1");
     printed.set(line.apply("null"));
     new Assertion<>(
       "Couldn't build the line.",
