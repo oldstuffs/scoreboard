@@ -89,6 +89,6 @@ public final class BukkitScoreboardSender implements ScoreboardSender<Player> {
   @Synchronized("scoreboards")
   void onQuit(@NotNull final Player player) {
     Optional.ofNullable(this.scoreboards.remove(player.getUniqueId()))
-      .ifPresent(scoreboard -> scoreboard.close(player));
+      .ifPresent(scoreboard -> BukkitPlayerScoreboard.close(player));
   }
 }

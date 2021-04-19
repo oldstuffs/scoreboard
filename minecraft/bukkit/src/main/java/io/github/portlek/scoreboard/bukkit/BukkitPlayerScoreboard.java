@@ -89,6 +89,18 @@ public final class BukkitPlayerScoreboard implements Closeable {
   private final UUID uniqueId;
 
   /**
+   * closes the scoreboard.
+   *
+   * @param player the player to close.
+   */
+  static void close(@NotNull final Player player) {
+    final var scoreboardManager = Bukkit.getScoreboardManager();
+    if (scoreboardManager != null) {
+      player.setScoreboard(scoreboardManager.getNewScoreboard());
+    }
+  }
+
+  /**
    * gets a random chat color.
    *
    * @param position the position to get.
@@ -106,19 +118,7 @@ public final class BukkitPlayerScoreboard implements Closeable {
     if (player == null) {
       return;
     }
-    this.close(player);
-  }
-
-  /**
-   * closes the scoreboard.
-   *
-   * @param player the player to close.
-   */
-  public void close(@NotNull final Player player) {
-    final var scoreboardManager = Bukkit.getScoreboardManager();
-    if (scoreboardManager != null) {
-      player.setScoreboard(scoreboardManager.getNewScoreboard());
-    }
+    BukkitPlayerScoreboard.close(player);
   }
 
   /**
