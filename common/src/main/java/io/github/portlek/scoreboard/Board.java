@@ -34,6 +34,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -438,6 +439,32 @@ public final class Board<O> implements Closeable {
     public final Builder<O> addStaticObservers(@NotNull final O... observers) {
       Collections.addAll(this.staticObservers, observers);
       return this;
+    }
+
+    /**
+     * sets the dynamic observers.
+     *
+     * @param dynamicObservers the dynamic observers to set.
+     *
+     * @return {@code this} for build chain.
+     */
+    @SafeVarargs
+    @NotNull
+    public final Builder<O> setDynamicObservers(@NotNull final Supplier<O>... dynamicObservers) {
+      return this.setDynamicObservers(Set.of(dynamicObservers));
+    }
+
+    /**
+     * sets the static observers.
+     *
+     * @param staticObservers the static observers to set.
+     *
+     * @return {@code this} for build chain.
+     */
+    @SafeVarargs
+    @NotNull
+    public final Builder<O> setStaticObservers(@NotNull final O... staticObservers) {
+      return this.setStaticObservers(Set.of(staticObservers));
     }
 
     /**
