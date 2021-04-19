@@ -29,7 +29,6 @@ import io.github.portlek.scoreboard.line.Line;
 import java.io.Closeable;
 import java.util.Collection;
 import java.util.Map;
-import java.util.Set;
 import org.jetbrains.annotations.NotNull;
 
 /**
