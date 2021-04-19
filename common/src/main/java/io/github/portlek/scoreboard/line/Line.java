@@ -28,6 +28,7 @@ package io.github.portlek.scoreboard.line;
 import java.io.Closeable;
 import java.util.function.Function;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Delegate;
 import org.jetbrains.annotations.NotNull;
@@ -62,12 +63,19 @@ public interface Line<O> extends Function<@NotNull O, @NotNull String>, Closeabl
    */
   @NotNull
   static <O> Line<O> simple(@NotNull final String line) {
-    return new Impl<>(observer -> line);
+    return new Impl<>(observer -> line, false);
   }
 
   @Override
   default void close() {
   }
+
+  /**
+   * checks if the line should update every sent.
+   *
+   * @return {@code true} if the line should update every sent.
+   */
+  boolean isUpdate();
 
   /**
    * a simple implementation of {@link Line}.
@@ -83,5 +91,20 @@ public interface Line<O> extends Function<@NotNull O, @NotNull String>, Closeabl
     @NotNull
     @Delegate
     private final Function<@NotNull O, @NotNull String> function;
+
+    /**
+     * the update.
+     */
+    @Getter
+    private final boolean update;
+
+    /**
+     * ctor.
+     *
+     * @param function the function.
+     */
+    private Impl(@NotNull final Function<@NotNull O, @NotNull String> function) {
+      this(function, true);
+    }
   }
 }

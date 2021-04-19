@@ -28,11 +28,11 @@ package io.github.portlek.scoreboard;
 import io.github.portlek.scoreboard.line.Line;
 import java.io.Closeable;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -78,13 +78,13 @@ public final class Board<O> implements Closeable {
    * the dynamic observers.
    */
   @NotNull
-  private final Set<Supplier<O>> dynamicObservers;
+  private final Collection<Supplier<O>> dynamicObservers;
 
   /**
    * the filters.
    */
   @NotNull
-  private final Set<Predicate<O>> filters;
+  private final Collection<Predicate<O>> filters;
 
   /**
    * the id.
@@ -114,19 +114,19 @@ public final class Board<O> implements Closeable {
    * the remove if.
    */
   @NotNull
-  private final Set<Predicate<O>> removeIf;
+  private final Collection<Predicate<O>> removeIf;
 
   /**
    * the run after.
    */
   @NotNull
-  private final Set<Consumer<O>> runAfter;
+  private final Collection<Consumer<O>> runAfter;
 
   /**
    * the run before.
    */
   @NotNull
-  private final Set<Consumer<O>> runBefore;
+  private final Collection<Consumer<O>> runBefore;
 
   /**
    * the scoreboard sender.
@@ -143,7 +143,7 @@ public final class Board<O> implements Closeable {
    * the static observers.
    */
   @NotNull
-  private final Set<O> staticObservers;
+  private final Collection<O> staticObservers;
 
   /**
    * the tick.
@@ -258,13 +258,13 @@ public final class Board<O> implements Closeable {
      * the dynamic observers.
      */
     @NotNull
-    private Set<Supplier<O>> dynamicObservers = new HashSet<>();
+    private Collection<Supplier<O>> dynamicObservers = new HashSet<>();
 
     /**
      * the filters.
      */
     @NotNull
-    private Set<Predicate<O>> filters = new HashSet<>();
+    private Collection<Predicate<O>> filters = new HashSet<>();
 
     /**
      * the id.
@@ -282,19 +282,19 @@ public final class Board<O> implements Closeable {
      * the remove if.
      */
     @NotNull
-    private Set<Predicate<O>> removeIf = new HashSet<>();
+    private Collection<Predicate<O>> removeIf = new HashSet<>();
 
     /**
      * the run after.
      */
     @NotNull
-    private Set<Consumer<O>> runAfter = new HashSet<>();
+    private Collection<Consumer<O>> runAfter = new HashSet<>();
 
     /**
      * the run before.
      */
     @NotNull
-    private Set<Consumer<O>> runBefore = new HashSet<>();
+    private Collection<Consumer<O>> runBefore = new HashSet<>();
 
     /**
      * the scoreboard sender.
@@ -311,7 +311,7 @@ public final class Board<O> implements Closeable {
      * the static observers.
      */
     @NotNull
-    private Set<O> staticObservers = new HashSet<>();
+    private Collection<O> staticObservers = new HashSet<>();
 
     /**
      * the tick.
@@ -489,7 +489,7 @@ public final class Board<O> implements Closeable {
      * @return {@code this} for build chain.
      */
     @NotNull
-    public Builder<O> setDynamicObservers(@NotNull final Set<Supplier<O>> dynamicObservers) {
+    public Builder<O> setDynamicObservers(@NotNull final Collection<Supplier<O>> dynamicObservers) {
       this.dynamicObservers = dynamicObservers;
       return this;
     }
@@ -502,7 +502,7 @@ public final class Board<O> implements Closeable {
      * @return {@code this} for build chain.
      */
     @NotNull
-    public Builder<O> setFilters(@NotNull final Set<Predicate<O>> filters) {
+    public Builder<O> setFilters(@NotNull final Collection<Predicate<O>> filters) {
       this.filters = filters;
       return this;
     }
@@ -541,7 +541,7 @@ public final class Board<O> implements Closeable {
      * @return {@code this} for builder chain.
      */
     @NotNull
-    public Builder<O> setRemoveIf(@NotNull final Set<Predicate<O>> removeIf) {
+    public Builder<O> setRemoveIf(@NotNull final Collection<Predicate<O>> removeIf) {
       this.removeIf = removeIf;
       return this;
     }
@@ -554,7 +554,7 @@ public final class Board<O> implements Closeable {
      * @return {@code this} for builder chain.
      */
     @NotNull
-    public Builder<O> setRunAfter(@NotNull final Set<Consumer<O>> runAfter) {
+    public Builder<O> setRunAfter(@NotNull final Collection<Consumer<O>> runAfter) {
       this.runAfter = runAfter;
       return this;
     }
@@ -567,7 +567,7 @@ public final class Board<O> implements Closeable {
      * @return {@code this} for builder chain.
      */
     @NotNull
-    public Builder<O> setRunBefore(@NotNull final Set<Consumer<O>> runBefore) {
+    public Builder<O> setRunBefore(@NotNull final Collection<Consumer<O>> runBefore) {
       this.runBefore = runBefore;
       return this;
     }
@@ -611,7 +611,7 @@ public final class Board<O> implements Closeable {
      * @return {@code this} for build chain.
      */
     @NotNull
-    public Builder<O> setStaticObservers(@NotNull final Set<O> staticObservers) {
+    public Builder<O> setStaticObservers(@NotNull final Collection<O> staticObservers) {
       this.staticObservers = staticObservers;
       return this;
     }
@@ -652,7 +652,7 @@ public final class Board<O> implements Closeable {
      * the static observers.
      */
     @NotNull
-    private final Set<O> staticObservers;
+    private final Collection<O> staticObservers;
 
     /**
      * ctor.
@@ -682,7 +682,7 @@ public final class Board<O> implements Closeable {
      */
     @NotNull
     @Synchronized("staticObservers")
-    private Set<O> getObservers() {
+    private Collection<O> getObservers() {
       final var observers = this.staticObservers.stream()
         .filter(observer ->
           this.board.getFilters().stream()

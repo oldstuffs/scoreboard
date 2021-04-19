@@ -27,9 +27,15 @@ package io.github.portlek.scoreboard.bukkit;
 
 import io.github.portlek.scoreboard.ScoreboardSender;
 import io.github.portlek.scoreboard.line.Line;
+import java.util.Collection;
 import java.util.Map;
-import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Synchronized;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
@@ -37,7 +43,8 @@ import org.jetbrains.annotations.NotNull;
 /**
  * a {@link Player} implementation of {@link ScoreboardSender}.
  */
-@RequiredArgsConstructor
+@Getter
+@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public final class BukkitScoreboardSender implements ScoreboardSender<Player> {
 
   /**
@@ -46,11 +53,34 @@ public final class BukkitScoreboardSender implements ScoreboardSender<Player> {
   @NotNull
   private final Plugin plugin;
 
+  /**
+   * the scoreboards.
+   */
+  private final Map<UUID, PlayerScoreboard> scoreboards = new ConcurrentHashMap<>();
+
   @Override
   public void close() {
+    this.scoreboards.values()
+      .forEach(PlayerScoreboard::close);
+    this.scoreboards.clear();
   }
 
   @Override
-  public void send(@NotNull final Set<Player> observers, @NotNull final Map<Integer, Line<Player>> lines) {
+  @Synchronized("scoreboards")
+  public void send(@NotNull final Collection<Player> observers, @NotNull final Map<Integer, Line<Player>> lines) {
+    observers.stream()
+      .map(Entity::getUniqueId)
+      .map(uniqueId -> this.scoreboards.computeIfAbsent(uniqueId, uuid -> new PlayerScoreboard(this, uuid)))
+      .forEach(scoreboard -> scoreboard.updateLines(lines));
+  }
+
+  /**
+   * runs when the player quits from the game.
+   *
+   * @param uniqueId the unique id to quit.
+   */
+  @Synchronized("scoreboards")
+  void onQuit(@NotNull final UUID uniqueId) {
+    this.scoreboards.remove(uniqueId);
   }
 }

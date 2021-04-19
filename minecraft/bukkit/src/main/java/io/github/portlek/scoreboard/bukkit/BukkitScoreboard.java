@@ -23,46 +23,49 @@
  *
  */
 
-package io.github.portlek.scoreboard;
+package io.github.portlek.scoreboard.bukkit;
 
-import io.github.portlek.scoreboard.line.Line;
-import java.io.Closeable;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Set;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * an interface to determine scoreboard senders.
- *
- * @param <O> type of the observers.
+ * a class that represents initializer for Bukkit's scoreboard system.
  */
-public interface ScoreboardSender<O> extends Closeable {
-
-  @Override
-  void close();
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+public final class BukkitScoreboard implements Listener {
 
   /**
-   * sends the scoreboard lines to the observers.
-   *
-   * @param observers the observers to send.
-   * @param lines the lines to send.
+   * the sender.
    */
-  void send(@NotNull Collection<O> observers, @NotNull Map<Integer, Line<O>> lines);
+  @NotNull
+  private final BukkitScoreboardSender sender;
 
   /**
-   * a class that represents empty {@link ScoreboardSender} implementation.
+   * initiate the scoreboard system.
    *
-   * @param <O> type of the observers.
+   * @param plugin the plugin to initiate.
+   *
+   * @return a bukkit scoreboard sender instance to use.
    */
-  final class Empty<O> implements ScoreboardSender<O> {
+  @NotNull
+  public static BukkitScoreboardSender init(@NotNull final Plugin plugin) {
+    final var sender = new BukkitScoreboardSender(plugin);
+    plugin.getServer().getPluginManager().registerEvents(new BukkitScoreboard(sender), plugin);
+    return sender;
+  }
 
-    @Override
-    public void close() {
-    }
-
-    @Override
-    public void send(@NotNull final Collection<O> observers, @NotNull final Map<Integer, Line<O>> lines) {
-    }
+  /**
+   * runs when a player quits.
+   *
+   * @param event the event to handle.
+   */
+  @EventHandler
+  public void handle(final PlayerQuitEvent event) {
+    this.sender.onQuit(event.getPlayer().getUniqueId());
   }
 }

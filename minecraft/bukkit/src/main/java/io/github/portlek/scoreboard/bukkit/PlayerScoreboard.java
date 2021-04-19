@@ -23,46 +23,68 @@
  *
  */
 
-package io.github.portlek.scoreboard;
+package io.github.portlek.scoreboard.bukkit;
 
 import io.github.portlek.scoreboard.line.Line;
 import java.io.Closeable;
-import java.util.Collection;
 import java.util.Map;
-import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import lombok.RequiredArgsConstructor;
+import lombok.Synchronized;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * an interface to determine scoreboard senders.
- *
- * @param <O> type of the observers.
+ * a class that represents player scoreboards.
  */
-public interface ScoreboardSender<O> extends Closeable {
+@RequiredArgsConstructor
+public final class PlayerScoreboard implements Closeable {
+
+  /**
+   * the lines.
+   */
+  @NotNull
+  private final Map<Integer, Line<Player>> lines = new ConcurrentHashMap<>();
+
+  /**
+   * the sender.
+   */
+  @NotNull
+  private final BukkitScoreboardSender sender;
+
+  /**
+   * the unique id.
+   */
+  @NotNull
+  private final UUID uniqueId;
+
+  /**
+   * ctor.
+   *
+   * @param sender the sender.
+   * @param player the player.
+   */
+  public PlayerScoreboard(@NotNull final BukkitScoreboardSender sender,
+                          @NotNull final Player player) {
+    this(sender, player.getUniqueId());
+  }
 
   @Override
-  void close();
+  public void close() {
+  }
 
   /**
-   * sends the scoreboard lines to the observers.
+   * updates {@link #lines}.
    *
-   * @param observers the observers to send.
-   * @param lines the lines to send.
+   * @param lines the lines to update.
    */
-  void send(@NotNull Collection<O> observers, @NotNull Map<Integer, Line<O>> lines);
-
-  /**
-   * a class that represents empty {@link ScoreboardSender} implementation.
-   *
-   * @param <O> type of the observers.
-   */
-  final class Empty<O> implements ScoreboardSender<O> {
-
-    @Override
-    public void close() {
-    }
-
-    @Override
-    public void send(@NotNull final Collection<O> observers, @NotNull final Map<Integer, Line<O>> lines) {
-    }
+  @Synchronized("lines")
+  void updateLines(@NotNull final Map<Integer, Line<Player>> lines) {
+    lines.forEach((lineNumber, line) -> {
+      if (line.isUpdate()) {
+        this.lines.put(lineNumber, line);
+      }
+    });
   }
 }
