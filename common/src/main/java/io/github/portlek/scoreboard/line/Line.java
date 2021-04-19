@@ -25,6 +25,7 @@
 
 package io.github.portlek.scoreboard.line;
 
+import java.io.Closeable;
 import java.util.function.Function;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -36,8 +37,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * @param <O> type of the observer.
  */
-@FunctionalInterface
-public interface Line<O> extends Function<@NotNull O, @NotNull String> {
+public interface Line<O> extends Function<@NotNull O, @NotNull String>, Closeable {
 
   /**
    * creates a simple line instance.
@@ -50,6 +50,10 @@ public interface Line<O> extends Function<@NotNull O, @NotNull String> {
   @NotNull
   static <O> Line<O> line(@NotNull final Function<@NotNull O, @NotNull String> line) {
     return new Impl<>(line);
+  }
+
+  @Override
+  default void close() {
   }
 
   /**

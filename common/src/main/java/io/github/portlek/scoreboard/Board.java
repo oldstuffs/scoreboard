@@ -196,6 +196,7 @@ public final class Board<O> implements Closeable {
   public void close() {
     this.asyncScheduler.shutdown();
     this.scoreboardSender.close();
+    this.lines.values().forEach(Line::close);
   }
 
   /**
