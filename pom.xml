@@ -24,5 +24,6 @@
   </properties>
   <modules>
     <module>common</module>
+    <module>minecraft</module>
   </modules>
 </project>
