@@ -35,14 +35,14 @@ final class LineTest {
 
   @Test
   void close() {
-    Line.line(Function.identity())
+    Line.dynamic(Function.identity())
       .close();
   }
 
   @Test
   void line() {
     final var printed = new AtomicReference<String>();
-    final var line = Line.line(observer -> "observer-1");
+    final var line = Line.dynamic(observer -> "observer-1");
     printed.set(line.apply("null"));
     new Assertion<>(
       "Couldn't build the line.",
@@ -54,7 +54,7 @@ final class LineTest {
   @Test
   void simple() {
     final var printed = new AtomicReference<String>();
-    final var line = Line.simple("observer-1");
+    final var line = Line.immutable("observer-1");
     printed.set(line.apply("null"));
     new Assertion<>(
       "Couldn't build the line.",

@@ -25,20 +25,45 @@
 
 package io.github.portlek.scoreboard;
 
-import java.util.Collections;
+import io.github.portlek.scoreboard.line.Line;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+import lombok.RequiredArgsConstructor;
+import lombok.ToString;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 
-final class ScoreboardSenderTest {
+final class BoardTest {
 
   @Test
-  void close() {
-    new ScoreboardSender.Empty<>()
-      .close();
+  void test() throws InterruptedException {
+    Board.newBuilder(User.class)
+      .setScoreboardSender(new Sender())
+      .addDynamicObserverList(() -> Set.of(new User("observer-1")))
+      .build()
+      .start();
   }
 
-  @Test
-  void send() {
-    new ScoreboardSender.Empty<>()
-      .send(Board.newBuilder(Object.class).build(), Collections.emptySet(), Collections.emptyList());
+  private static final class Sender implements ScoreboardSender<User> {
+
+    @Override
+    public void close() {
+      System.out.println("closed");
+    }
+
+    @Override
+    public void send(@NotNull final Board<User> board, @NotNull final Collection<User> observers,
+                     @NotNull final List<Line<User>> lines) {
+      System.out.println("send -> " + observers);
+    }
+  }
+
+  @ToString
+  @RequiredArgsConstructor
+  private static final class User {
+
+    @NotNull
+    private final String name;
   }
 }

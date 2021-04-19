@@ -23,22 +23,44 @@
  *
  */
 
-package io.github.portlek.scoreboard;
+package io.github.portlek.scoreboard.line;
 
-import java.util.Collections;
-import org.junit.jupiter.api.Test;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-final class ScoreboardSenderTest {
+/**
+ * an interface to determine line colors.
+ */
+public interface LineColor {
 
-  @Test
-  void close() {
-    new ScoreboardSender.Empty<>()
-      .close();
-  }
+  /**
+   * the format.
+   *
+   * @param text the text to format.
+   *
+   * @return formatted text.
+   */
+  @NotNull
+  String format(@NotNull String text);
 
-  @Test
-  void send() {
-    new ScoreboardSender.Empty<>()
-      .send(Board.newBuilder(Object.class).build(), Collections.emptySet(), Collections.emptyList());
-  }
+  /**
+   * gets a new color.
+   *
+   * @param charAt the char at to get.
+   *
+   * @return a new color.
+   */
+  @Nullable
+  LineColor getByChar(char charAt);
+
+  /**
+   * obtains the color char.
+   *
+   * @return color char.
+   */
+  char getColorChar();
+
+  @NotNull
+  @Override
+  String toString();
 }

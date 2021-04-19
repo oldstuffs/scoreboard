@@ -25,20 +25,27 @@
 
 package io.github.portlek.scoreboard;
 
-import java.util.Collections;
 import org.junit.jupiter.api.Test;
 
-final class ScoreboardSenderTest {
+final class BoardTypeTest {
 
   @Test
-  void close() {
-    new ScoreboardSender.Empty<>()
-      .close();
+  void getStartNumber() {
+    BoardType.MODERN.getStartNumber();
   }
 
   @Test
-  void send() {
-    new ScoreboardSender.Empty<>()
-      .send(Board.newBuilder(Object.class).build(), Collections.emptySet(), Collections.emptyList());
+  void isDescending() {
+    BoardType.MODERN.isDescending();
+  }
+
+  @Test
+  void valueOf() {
+    BoardType.valueOf("MODERN");
+  }
+
+  @Test
+  void values() {
+    BoardType.values();
   }
 }

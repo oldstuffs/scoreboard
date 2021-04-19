@@ -25,20 +25,35 @@
 
 package io.github.portlek.scoreboard;
 
-import java.util.Collections;
-import org.junit.jupiter.api.Test;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
-final class ScoreboardSenderTest {
+/**
+ * an enum class that contains board types.
+ */
+@Getter
+@RequiredArgsConstructor
+public enum BoardType {
+  /**
+   * the kohi.
+   */
+  KOHI(true, 15),
+  /**
+   * the viper.
+   */
+  VIPER(true, -1),
+  /**
+   * the modern.
+   */
+  MODERN(false, 1);
 
-  @Test
-  void close() {
-    new ScoreboardSender.Empty<>()
-      .close();
-  }
+  /**
+   * the descending.
+   */
+  private final boolean descending;
 
-  @Test
-  void send() {
-    new ScoreboardSender.Empty<>()
-      .send(Board.newBuilder(Object.class).build(), Collections.emptySet(), Collections.emptyList());
-  }
+  /**
+   * the start number.
+   */
+  private final int startNumber;
 }

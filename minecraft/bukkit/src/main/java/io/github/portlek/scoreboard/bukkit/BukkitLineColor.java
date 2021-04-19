@@ -23,47 +23,58 @@
  *
  */
 
-package io.github.portlek.scoreboard;
+package io.github.portlek.scoreboard.bukkit;
 
-import io.github.portlek.scoreboard.line.Line;
-import java.io.Closeable;
-import java.util.Collection;
-import java.util.List;
+import io.github.portlek.scoreboard.line.LineColor;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import org.bukkit.ChatColor;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
- * an interface to determine scoreboard senders.
- *
- * @param <O> type of the observers.
+ * a class that represents Bukkit's line colors.
  */
-public interface ScoreboardSender<O> extends Closeable {
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+public final class BukkitLineColor implements LineColor {
+
+  /**
+   * the color.
+   */
+  @NotNull
+  private final ChatColor color;
+
+  /**
+   * creates a new line color instance.
+   *
+   * @return a newly created line color instance.
+   */
+  @NotNull
+  public static LineColor create() {
+    return new BukkitLineColor(ChatColor.RESET);
+  }
+
+  @NotNull
+  @Override
+  public String format(@NotNull final String text) {
+    return ChatColor.translateAlternateColorCodes('&', text);
+  }
+
+  @Nullable
+  @Override
+  public LineColor getByChar(final char charAt) {
+    final var newColor = ChatColor.getByChar(charAt);
+    return newColor == null ? null : new BukkitLineColor(newColor);
+  }
 
   @Override
-  void close();
+  public char getColorChar() {
+    return ChatColor.COLOR_CHAR;
+  }
 
-  /**
-   * sends the scoreboard lines to the observers.
-   *
-   * @param board the board to send.
-   * @param observers the observers to send.
-   * @param lines the lines to send.
-   */
-  void send(@NotNull Board<O> board, @NotNull Collection<O> observers, @NotNull List<Line<O>> lines);
-
-  /**
-   * a class that represents empty {@link ScoreboardSender} implementation.
-   *
-   * @param <O> type of the observers.
-   */
-  final class Empty<O> implements ScoreboardSender<O> {
-
-    @Override
-    public void close() {
-    }
-
-    @Override
-    public void send(@NotNull final Board<O> board, @NotNull final Collection<O> observers,
-                     @NotNull final List<Line<O>> lines) {
-    }
+  @NotNull
+  @Override
+  public String toString() {
+    return this.color.toString();
   }
 }

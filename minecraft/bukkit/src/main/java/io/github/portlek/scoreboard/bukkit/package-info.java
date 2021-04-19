@@ -22,23 +22,7 @@
  * SOFTWARE.
  *
  */
-
-package io.github.portlek.scoreboard;
-
-import java.util.Collections;
-import org.junit.jupiter.api.Test;
-
-final class ScoreboardSenderTest {
-
-  @Test
-  void close() {
-    new ScoreboardSender.Empty<>()
-      .close();
-  }
-
-  @Test
-  void send() {
-    new ScoreboardSender.Empty<>()
-      .send(Board.newBuilder(Object.class).build(), Collections.emptySet(), Collections.emptyList());
-  }
-}
+/**
+ * the package that contains implementations of the scoreboard system.
+ */
+package io.github.portlek.scoreboard.bukkit;
