@@ -26,7 +26,9 @@
 package io.github.portlek.scoreboard.line;
 
 import java.io.Closeable;
+import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -64,6 +66,33 @@ public interface Line<O> extends Function<@NotNull O, @NotNull String>, Closeabl
   @NotNull
   static <O> Line<O> immutable(@NotNull final String line) {
     return new Impl<>(observer -> line, false);
+  }
+
+  /**
+   * creates a merged line.
+   *
+   * @param lines the lines to create.
+   * @param <O> type of the observers.
+   *
+   * @return a newly created merged line.
+   */
+  @NotNull
+  static <O> Merged<O> merged(@NotNull final List<Line<O>> lines) {
+    return new Merged<>(lines);
+  }
+
+  /**
+   * creates a merged line.
+   *
+   * @param lines the lines to create.
+   * @param <O> type of the observers.
+   *
+   * @return a newly created merged line.
+   */
+  @SafeVarargs
+  @NotNull
+  static <O> Merged<O> merged(@NotNull final Line<O>... lines) {
+    return Line.merged(List.of(lines));
   }
 
   @Override
@@ -113,5 +142,33 @@ public interface Line<O> extends Function<@NotNull O, @NotNull String>, Closeabl
      */
     @Getter
     private final boolean update;
+  }
+
+  /**
+   * a class that represents merged lines.
+   *
+   * @param <O> type of the observer.
+   */
+  @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+  final class Merged<O> implements Line<O> {
+
+    /**
+     * the lines.
+     */
+    @NotNull
+    private final List<Line<O>> lines;
+
+    @NotNull
+    @Override
+    public String apply(@NotNull final O o) {
+      return this.lines.stream()
+        .map(line -> line.apply(o))
+        .collect(Collectors.joining(""));
+    }
+
+    @Override
+    public boolean isUpdate() {
+      return this.lines.stream().anyMatch(Line::isUpdate);
+    }
   }
 }
