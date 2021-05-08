@@ -130,9 +130,9 @@ public final class TestScoreboard {
         observer -> observer.sendMessage("Scoreboard sent.")))
       // Usage example of the run before.
       // This methods will run before scoreboard send.
-      .addRunAfter(
+      .addRunBefore(
         observer -> observer.sendMessage("Scoreboard is sending."))
-      .setRunAfter(Set.of(
+      .setRunBefore(Set.of(
         observer -> observer.sendMessage("Scoreboard is sending.")))
       .build();
     // Send the board for once.
