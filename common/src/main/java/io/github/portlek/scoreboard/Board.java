@@ -79,13 +79,13 @@ public final class Board<O> implements Closeable {
    * the dynamic observer list.
    */
   @NotNull
-  private final Collection<Supplier<Collection<O>>> dynamicObserverList;
+  private final Collection<Supplier<Collection<? extends O>>> dynamicObserverList;
 
   /**
    * the dynamic observers.
    */
   @NotNull
-  private final Collection<Supplier<O>> dynamicObservers;
+  private final Collection<Supplier<? extends O>> dynamicObservers;
 
   /**
    * the filters.
@@ -277,13 +277,13 @@ public final class Board<O> implements Closeable {
      * the dynamic observer list.
      */
     @NotNull
-    private Collection<Supplier<Collection<O>>> dynamicObserverList = new HashSet<>();
+    private Collection<Supplier<Collection<? extends O>>> dynamicObserverList = new HashSet<>();
 
     /**
      * the dynamic observers.
      */
     @NotNull
-    private Collection<Supplier<O>> dynamicObservers = new HashSet<>();
+    private Collection<Supplier<? extends O>> dynamicObservers = new HashSet<>();
 
     /**
      * the filters.
@@ -364,7 +364,8 @@ public final class Board<O> implements Closeable {
      */
     @SafeVarargs
     @NotNull
-    public final Builder<O> addDynamicObserverList(@NotNull final Supplier<Collection<O>>... dynamicObserverList) {
+    public final Builder<O> addDynamicObserverList(
+      @NotNull final Supplier<Collection<? extends O>>... dynamicObserverList) {
       Collections.addAll(this.dynamicObserverList, dynamicObserverList);
       return this;
     }
@@ -476,7 +477,8 @@ public final class Board<O> implements Closeable {
      */
     @SafeVarargs
     @NotNull
-    public final Builder<O> setDynamicObserverList(@NotNull final Supplier<Collection<O>>... dynamicObserverList) {
+    public final Builder<O> setDynamicObserverList(
+      @NotNull final Supplier<Collection<? extends O>>... dynamicObserverList) {
       return this.setDynamicObserverList(Set.of(dynamicObserverList));
     }
 
@@ -574,7 +576,8 @@ public final class Board<O> implements Closeable {
      * @return {@code this} for build chain.
      */
     @NotNull
-    public Builder<O> setDynamicObserverList(@NotNull final Collection<Supplier<Collection<O>>> dynamicObserverList) {
+    public Builder<O> setDynamicObserverList(
+      @NotNull final Collection<Supplier<Collection<? extends O>>> dynamicObserverList) {
       this.dynamicObserverList = dynamicObserverList;
       return this;
     }
@@ -587,7 +590,7 @@ public final class Board<O> implements Closeable {
      * @return {@code this} for build chain.
      */
     @NotNull
-    public Builder<O> setDynamicObservers(@NotNull final Collection<Supplier<O>> dynamicObservers) {
+    public Builder<O> setDynamicObservers(@NotNull final Collection<Supplier<? extends O>> dynamicObservers) {
       this.dynamicObservers = dynamicObservers;
       return this;
     }

@@ -165,7 +165,7 @@ public interface AnimatedLine<O> extends Line<O> {
   static <O> AnimatedLine<O> highlighted(@NotNull final String context, @NotNull final String highlightFormat,
                                          @NotNull final String normalFormat, @NotNull final String prefix,
                                          @NotNull final String suffix, final boolean update) {
-    return new Highlighted<O>(context, highlightFormat, normalFormat, prefix, suffix, update);
+    return new Highlighted<>(context, highlightFormat, normalFormat, prefix, suffix, update);
   }
 
   /**
