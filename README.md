@@ -16,3 +16,9 @@
 ```groovy
 implementation("io.github.portlek:scoreboard-bukkit:${version}")
 ```
+
+## Example of Usage
+
+```java
+
+```
