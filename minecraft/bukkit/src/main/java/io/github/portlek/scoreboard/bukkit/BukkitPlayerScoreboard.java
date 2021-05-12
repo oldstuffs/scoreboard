@@ -155,7 +155,7 @@ public final class BukkitPlayerScoreboard implements Closeable {
   /**
    * ticks.
    */
-  @Synchronized("lines")
+  @Synchronized("setup")
   void tick() {
     if (!this.setup.get()) {
       return;
