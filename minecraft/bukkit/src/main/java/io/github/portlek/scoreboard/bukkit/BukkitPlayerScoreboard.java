@@ -315,11 +315,8 @@ public final class BukkitPlayerScoreboard implements Closeable {
 
   /**
    * setups the player.
-   *
-   * @return {@code this} for builder chain.
    */
-  @NotNull
-  private BukkitPlayerScoreboard setup() {
+  private void setup() {
     Bukkit.getScheduler().runTask(this.plugin, () -> {
       final var player = Bukkit.getPlayer(this.uniqueId);
       if (player != null) {
@@ -328,7 +325,6 @@ public final class BukkitPlayerScoreboard implements Closeable {
       }
       this.setup.set(true);
     });
-    return this;
   }
 
   /**
