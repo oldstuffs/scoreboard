@@ -51,8 +51,8 @@
 ```xml
 <dependencies>
   <dependency>
-    <groupId>com.github.portlek</groupId>
-    <artifactId>scoreboard</artifactId>
+    <groupId>com.github.portlek.scoreboard</groupId>
+    <artifactId>scoreboard-bukkit</artifactId>
     <version>${version}</version>
   </dependency>
 </dependencies>
@@ -76,7 +76,7 @@ repositories {
 
 ```groovy
 dependencies {
-  implementation("com.github.portlek:scoreboar:${version}")
+  implementation("com.github.portlek.scoreboard:scoreboard-bukkit:${version}")
 }
 ```
 
